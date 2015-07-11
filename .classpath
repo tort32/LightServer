@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/jetty-http-9.3.0.v20150612.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/jetty-io-9.3.0.v20150612.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/jetty-server-9.3.0.v20150612.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/jetty-servlet-9.3.0.v20150612.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/jetty-util-9.3.0.v20150612.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-distribution-9.3.0.v20150612/lib/servlet-api-3.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

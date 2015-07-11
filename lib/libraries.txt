@@ -1,0 +1,9 @@
+== Jetty ==
+http://www.eclipse.org/jetty/
+Release 9.3.0.v20150612
+Extract project dependencies into LightServer/lib/jetty-distribution-9.3.0.v20150612/lib
+
+== Google gson ==
+https://github.com/google/gson
+Version 2.3.1
+Download Maven artifacts into LightServer/lib/gson-2.3.1
