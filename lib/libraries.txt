@@ -1,9 +1,24 @@
 == Jetty ==
 http://www.eclipse.org/jetty/
-Release 9.3.0.v20150612
+Version 9.3.0.v20150612
+http://download.eclipse.org/jetty/stable-9/dist/jetty-distribution-9.3.0.v20150612.zip
 Extract project dependencies into LightServer/lib/jetty-distribution-9.3.0.v20150612/lib
 
-== Google gson ==
-https://github.com/google/gson
-Version 2.3.1
-Download Maven artifacts into LightServer/lib/gson-2.3.1
+== Jersey ==
+https://jersey.java.net/index.html
+Version 2.19
+http://repo1.maven.org/maven2/org/glassfish/jersey/bundles/jaxrs-ri/2.19/jaxrs-ri-2.19.zip
+Extract project dependencies into LightServer/lib/jaxrs-ri-2.19/jaxrs-ri/lib
+
+== Jersey Media Json Jackson ==
+http://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-json-jackson
+Version 2.19
+http://central.maven.org/maven2/org/glassfish/jersey/media/jersey-media-json-jackson/2.19/jersey-media-json-jackson-2.19.jar
+http://central.maven.org/maven2/org/glassfish/jersey/ext/jersey-entity-filtering/2.19/jersey-entity-filtering-2.19.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.5.1/jackson-core-2.5.1.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.5.1/jackson-databind-2.5.1.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.5.1/jackson-annotations-2.5.1.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/jaxrs/jackson-jaxrs-base/2.5.1/jackson-jaxrs-base-2.5.1.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/jaxrs/jackson-jaxrs-json-provider/2.5.1/jackson-jaxrs-json-provider-2.5.1.jar
+http://central.maven.org/maven2/com/fasterxml/jackson/module/jackson-module-jaxb-annotations/2.5.1/jackson-module-jaxb-annotations-2.5.1.jar
+Place Maven library with dependencies into LightServer/lib/jersey-media-json-jackson-2.19
