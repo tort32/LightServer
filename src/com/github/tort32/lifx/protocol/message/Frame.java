@@ -2,9 +2,7 @@ package com.github.tort32.lifx.protocol.message;
 
 import com.github.tort32.lifx.protocol.InBuffer;
 import com.github.tort32.lifx.protocol.OutBuffer;
-import com.github.tort32.lifx.protocol.Types.UInt16;
-import com.github.tort32.lifx.protocol.Types.UInt32;
-import com.github.tort32.lifx.protocol.Types.UInt8;
+import com.github.tort32.lifx.protocol.Types.*;
 
 public class Frame {
 	public UInt16 mSize = new UInt16(0); // 16 bits. Size of entire message in bytes including this field
@@ -23,24 +21,20 @@ public class Frame {
 		buffer.checkLength(LENGTH);
 		mSize = buffer.readUInt16();
 		byte[] b23 = buffer.readBytes(2);
-		mOrigin.set((byte) ((b23[0] >> 6) & 0x03));
-		mTagged = (byte) ((b23[0] >> 5) & 0x01);
-		mAddressable = (byte) ((b23[0] >> 4) & 0x01);
-		mProtocol.set(((b23[1] & 0xFF) << 8) | (b23[0] & 0xFF));
+		mOrigin.set((byte) ((b23[1] >> 6) & 0x03));
+		mTagged = (byte) ((b23[1] >> 5) & 0x01);
+		mAddressable = (byte) ((b23[1] >> 4) & 0x01);
+		mProtocol.set(((b23[1] & 0x0F) << 8) | (b23[0] & 0xFF));
 		mSource = buffer.readUInt32();
 	}
 
 	public void write(OutBuffer buffer) {
 		// Do some magic to write 12 bits of uint16 and 4 bits of other fields in 2 bytes
-		byte[] b23 = new OutBuffer().write(mProtocol).toArray();
-		b23[1] |= (byte) (((mOrigin.getShort() & 0x03) << 6) | ((mTagged & 0x01) << 5) | ((mAddressable & 0x01) << 4));
-		// TODO does it correct?
-		/*buffer[Offset + 2] = (byte) (mProtocol & 0x00FF);
-		buffer[Offset + 3] = (byte) (((mOrigin & 0x03) << 6) | ((mTagged & 0x01) << 5) |
-		                             ((mAddressable & 0x01) << 4) | ((mProtocol & 0x0F00) >> 8));*/
+		byte[] b23 = new OutBuffer(2).write(mProtocol).toArray();
+		b23[1] |= (byte) (((mOrigin.getValue() & 0x03) << 6) | ((mTagged & 0x01) << 5) | ((mAddressable & 0x01) << 4));
 		buffer
 			.beginChunk()
-			.write(mSize) // TODO Do we need to have correct size here? See Message.toArray size inscription
+			.write(mSize)
 			.write(b23)
 			.write(mSource)
 			.endChunk(LENGTH);

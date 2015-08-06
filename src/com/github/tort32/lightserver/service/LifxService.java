@@ -1,71 +1,102 @@
 package com.github.tort32.lightserver.service;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
+import com.github.tort32.lifx.UdpBroadcast;
+import com.github.tort32.lifx.UdpSocket;
+import com.github.tort32.lifx.device.recieve.StateService;
+import com.github.tort32.lifx.device.send.GetService;
+import com.github.tort32.lifx.light.recieve.State;
+import com.github.tort32.lifx.light.send.Get;
+import com.github.tort32.lifx.protocol.message.Message;
+import com.github.tort32.lightserver.entity.LifxEndpoint;
+import com.github.tort32.lightserver.entity.LifxState;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 
 @Path("/lifx")
+@Api(value = "/lifx", description = "LIFX raw operations")
 public class LifxService {
-
-	@GET
-	@Path("test")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String test() {
-		return "Test";
-	}
 
 	@GET
 	@Path("discover")
 	@Produces({MediaType.APPLICATION_JSON})
-	public Response discover() throws IOException {
+	@ApiOperation(
+			value = "Discover LIFX endpoints",
+			response = LifxEndpoint.class,
+			responseContainer = "List")
+	public List<LifxEndpoint> discover() throws IOException {
+		UdpBroadcast socket = new UdpBroadcast();
+		
+		socket.send(new Message(new GetService()) {{
+			setBroadcast();
+			setSource(Message.SENDER_ID);
+		}});
+		
 		List<LifxEndpoint> endpoints = new ArrayList<LifxEndpoint>();
-
-		// Hardcoded packet for GetService message
-		byte[] discoverPacket = new byte[]{0x24, 0x00, 0x00, 0x34, 0x55, (byte) 0xAA, (byte) 0xAD, (byte) 0xBA, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00};
-
-		DatagramSocket socket = new DatagramSocket();
-		socket.setBroadcast(true);
-		socket.setSoTimeout(1000);
-
-		InetAddress broadcast = InetAddress.getByName("255.255.255.255");
-		DatagramPacket sendPacket = new DatagramPacket(discoverPacket, discoverPacket.length, broadcast, 56700);
-		socket.send(sendPacket);
-
-		byte[] buf = new byte[64];
-		DatagramPacket packet = new DatagramPacket(buf, buf.length);
-		while(true) {
-			try {
-				socket.receive(packet);
-			} catch(SocketTimeoutException timeout) {
-				break;
+		socket.receive((ip, rcvMsg) -> {
+			if (rcvMsg.mPayload instanceof StateService) {
+				StateService payload = (StateService) rcvMsg.mPayload;
+				if (Message.SENDER_ID == rcvMsg.mFrame.mSource.getValue() &&
+						StateService.Service.UDP.getValue() == payload.mService.getValue()) {
+					String mac = rcvMsg.mFrameAddress.mTarget.getHexValue();
+					int port = (int) payload.mPort.getValue();
+					endpoints.add(new LifxEndpoint(ip, mac, port));
+				}
 			}
-			byte[] received = packet.getData();
-			packet.getLength();
-			System.out.println("Quote of the Moment: " + dumpBytes(received));
-			String ip = packet.getAddress().getHostAddress();
-			int port = packet.getPort();
-			endpoints.add(new LifxEndpoint(ip, port));
-		}
+		});
+		
 		socket.close();
-
-		return Response.ok().entity(endpoints).build();
+		
+		return endpoints;
 	}
-
-	String dumpBytes(byte[] a) {
-		StringBuilder sb = new StringBuilder();
-		for(byte b : a) {
-			sb.append(String.format("%02X ", b));
-		}
-		return sb.toString();
+	
+	@POST
+	@Path("state")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Get LIFX device state",
+			httpMethod = "POST",
+			consumes = "application/json",
+			response = LifxState.class)
+	public LifxState getState(
+			@ApiParam( value = "LIFX endpoint description", required = true )
+			LifxEndpoint endpoint) throws IOException {
+		InetAddress ip = InetAddress.getByName(endpoint.ip);
+		
+		UdpSocket socket = new UdpSocket(ip, endpoint.port);
+		
+		socket.send(new Message(new Get()) {{
+			setSource(Message.SENDER_ID);
+			setTarget(endpoint.mac);
+		}});
+		
+		final AtomicReference<LifxState> ret = new AtomicReference<LifxState>();
+		socket.receive((msg) -> {
+			if (Message.SENDER_ID == msg.mFrame.mSource.getValue()) {
+				if (msg.mPayload instanceof State) {
+					ret.set(new LifxState((State) msg.mPayload));
+					return true;
+				}
+			}
+			return false;
+		});
+		
+		socket.close();
+		
+		return ret.get();
 	}
 }

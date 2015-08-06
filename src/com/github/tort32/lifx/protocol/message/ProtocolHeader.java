@@ -2,11 +2,10 @@ package com.github.tort32.lifx.protocol.message;
 
 import com.github.tort32.lifx.protocol.InBuffer;
 import com.github.tort32.lifx.protocol.OutBuffer;
-import com.github.tort32.lifx.protocol.Types.UInt16;
-import com.github.tort32.lifx.protocol.Types.UInt64;
+import com.github.tort32.lifx.protocol.Types.*;
 
 public class ProtocolHeader {
-	public UInt64 mReserved1 = new UInt64(0); // 64 bits. Reserved
+	public UInt64 mReserved1 = new UInt64(0, 0); // 64 bits. Reserved
     public UInt16 mType = new UInt16(0); // 16 bits. ProtocolMessage type determines the payload being used
     public UInt16 mReserved2 = new UInt16(0); // 16 bits. Reserved
 

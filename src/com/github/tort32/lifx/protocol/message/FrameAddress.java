@@ -1,12 +1,12 @@
 package com.github.tort32.lifx.protocol.message;
 
 import com.github.tort32.lifx.protocol.InBuffer;
+import com.github.tort32.lifx.protocol.MacAddress;
 import com.github.tort32.lifx.protocol.OutBuffer;
-import com.github.tort32.lifx.protocol.Types.UInt64;
-import com.github.tort32.lifx.protocol.Types.UInt8;
+import com.github.tort32.lifx.protocol.Types.*;
 
 public class FrameAddress {
-	public UInt64 mTarget = new UInt64(0); // 64 bits. 6 byte device address (MAC address) or zero (0) means all devices
+	public MacAddress mTarget = new MacAddress(); // 64 bits. 6 byte device address (MAC address) or zero (0) means all devices
 	public UInt8[] mReserved1 = new UInt8[6]; // 48 bits. Must all be zero (0)
 	public byte mReserved2; // 6 bits. Reserved
 	public byte mAckRequired; // 1 bit. Acknowledgement message required
@@ -16,11 +16,17 @@ public class FrameAddress {
 	public static final int LENGTH = 16;
 
 	public FrameAddress() {
+		mReserved1[5] = new UInt8(0);
+		mReserved1[4] = new UInt8(0);
+		mReserved1[3] = new UInt8(0);
+		mReserved1[2] = new UInt8(0);
+		mReserved1[1] = new UInt8(0);
+		mReserved1[0] = new UInt8(0);
 	}
 
 	public FrameAddress(InBuffer buffer) {
 		buffer.checkLength(LENGTH);
-		mTarget = buffer.readUInt64();
+		mTarget = buffer.readMacAddress();
 		mReserved1[5] = buffer.readUInt8();
 		mReserved1[4] = buffer.readUInt8();
 		mReserved1[3] = buffer.readUInt8();
@@ -54,8 +60,9 @@ public class FrameAddress {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName() + " {\n");
-		sb.append("  mTarget=" + mTarget.getHexValue() + "\n");
+		sb.append("  mTarget=" + mTarget + "\n");
 		sb.append("  mReserved1=" + mReserved1[5] + mReserved1[4] + mReserved1[3] + mReserved1[2] + mReserved1[1] + mReserved1[0] + "\n");
+		sb.append("  mReserved2=" + mReserved2 + "\n");
 		sb.append("  mAckRequired=" + mAckRequired + "\n");
 		sb.append("  mResRequired=" + mResRequired + "\n");
 		sb.append("  mSequence=" + mSequence + "\n");

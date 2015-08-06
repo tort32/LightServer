@@ -1,9 +1,7 @@
 package com.github.tort32.lifx.protocol.message;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.github.tort32.lifx.protocol.OutBuffer;
-import com.github.tort32.lifx.protocol.Types.UInt16;
+import com.github.tort32.lifx.protocol.Types.*;
 
 public abstract class Payload {
 	public int type;
@@ -23,6 +21,13 @@ public abstract class Payload {
 	}
 
 	public void write(OutBuffer buffer) {
-		throw new NotImplementedException();
+		throw new RuntimeException("Not implemented");
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+	    sb.append(getClass().getSimpleName() + " {}");
+	    return sb.toString();  
 	}
 }
