@@ -6,9 +6,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
-import com.github.tort32.lifx.light.send.*;
+import com.github.tort32.lifx.device.send.SetPower;
 import com.github.tort32.lifx.protocol.Types;
-import com.github.tort32.lifx.protocol.message.*;
+import com.github.tort32.lifx.protocol.message.Message;
+import com.github.tort32.lifx.protocol.message.Payload;
 
 public class ProtocolTest {
 	public static void main(String[] args) throws IOException {
@@ -19,7 +20,10 @@ public class ProtocolTest {
 		socket.setSoTimeout(1000);
 		
 		//Payload payload = new SetColor(true, HSBK.Red, 1000);
-		Payload payload = new Get();
+		//Payload payload = new SetLabel("My bulb");
+		//Payload payload = new Get();
+		Payload payload = new SetPower(true);
+		
 		Message sndMsg = new Message(payload);
 		sndMsg.setSource(Message.SENDER_ID);
 		sndMsg.setTarget("D073D5034927");

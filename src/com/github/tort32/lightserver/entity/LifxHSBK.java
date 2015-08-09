@@ -5,12 +5,14 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.tort32.lifx.protocol.HSBK;
 import com.wordnik.swagger.annotations.ApiModel;
 
 @ApiModel(value = "LIFX color")
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LifxHSBK {
 
 	@XmlElement(required = true)
@@ -41,5 +43,9 @@ public class LifxHSBK {
 		this.saturation = color.getSaturation();
 		this.brightness = color.getBrightness();
 		this.kelvin = color.getKelvin();
+	}
+	
+	public HSBK toHSBK() {
+		return new HSBK(hue, saturation, brightness, kelvin);
 	}
 }

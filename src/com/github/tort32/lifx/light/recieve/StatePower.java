@@ -20,7 +20,7 @@ public class StatePower extends Payload {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getClass().getSimpleName() + " {\n");
-		sb.append("  mLevel=" + mLevel + "\n");
+		sb.append("  mLevel=" + mLevel.getHexValue() + "\n");
 		sb.append("}");
 		return sb.toString();
 	}

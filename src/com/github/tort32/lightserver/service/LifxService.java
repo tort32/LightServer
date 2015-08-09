@@ -1,33 +1,35 @@
 package com.github.tort32.lightserver.service;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
-import com.github.tort32.lifx.UdpBroadcast;
-import com.github.tort32.lifx.UdpSocket;
-import com.github.tort32.lifx.device.recieve.StateService;
-import com.github.tort32.lifx.device.send.GetService;
 import com.github.tort32.lifx.light.recieve.State;
 import com.github.tort32.lifx.light.send.Get;
-import com.github.tort32.lifx.protocol.message.Message;
+import com.github.tort32.lifx.server.LifxServer;
+import com.github.tort32.lifx.server.Light;
 import com.github.tort32.lightserver.entity.LifxEndpoint;
+import com.github.tort32.lightserver.entity.LifxSetColor;
+import com.github.tort32.lightserver.entity.LifxSetPower;
 import com.github.tort32.lightserver.entity.LifxState;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
+@Singleton
 @Path("/lifx")
-@Api(value = "/lifx", description = "LIFX raw operations")
+@Api(value = "/lifx", description = "LIFX light API")
 public class LifxService {
 
 	@GET
@@ -38,65 +40,73 @@ public class LifxService {
 			response = LifxEndpoint.class,
 			responseContainer = "List")
 	public List<LifxEndpoint> discover() throws IOException {
-		UdpBroadcast socket = new UdpBroadcast();
-		
-		socket.send(new Message(new GetService()) {{
-			setBroadcast();
-			setSource(Message.SENDER_ID);
-		}});
-		
-		List<LifxEndpoint> endpoints = new ArrayList<LifxEndpoint>();
-		socket.receive((ip, rcvMsg) -> {
-			if (rcvMsg.mPayload instanceof StateService) {
-				StateService payload = (StateService) rcvMsg.mPayload;
-				if (Message.SENDER_ID == rcvMsg.mFrame.mSource.getValue() &&
-						StateService.Service.UDP.getValue() == payload.mService.getValue()) {
-					String mac = rcvMsg.mFrameAddress.mTarget.getHexValue();
-					int port = (int) payload.mPort.getValue();
-					endpoints.add(new LifxEndpoint(ip, mac, port));
-				}
-			}
-		});
-		
-		socket.close();
-		
+		List<LifxEndpoint> endpoints = new LinkedList<LifxEndpoint>();
+		for(Light light : LifxServer.INSTANCE.discover()) {
+			LifxEndpoint endpoint = new LifxEndpoint(light.getIp(), light.getMac(), light.getPort());
+			endpoints.add(endpoint);
+		}
 		return endpoints;
 	}
 	
-	@POST
-	@Path("state")
-	@Consumes({MediaType.APPLICATION_JSON})
+	@GET
+	@Path("{selector}/state")
 	@Produces({MediaType.APPLICATION_JSON})
 	@ApiOperation(
-			value = "Get LIFX device state",
-			httpMethod = "POST",
-			consumes = "application/json",
+			value = "Get light state",
+			httpMethod = "GET",
 			response = LifxState.class)
-	public LifxState getState(
-			@ApiParam( value = "LIFX endpoint description", required = true )
-			LifxEndpoint endpoint) throws IOException {
-		InetAddress ip = InetAddress.getByName(endpoint.ip);
-		
-		UdpSocket socket = new UdpSocket(ip, endpoint.port);
-		
-		socket.send(new Message(new Get()) {{
-			setSource(Message.SENDER_ID);
-			setTarget(endpoint.mac);
-		}});
-		
-		final AtomicReference<LifxState> ret = new AtomicReference<LifxState>();
-		socket.receive((msg) -> {
-			if (Message.SENDER_ID == msg.mFrame.mSource.getValue()) {
-				if (msg.mPayload instanceof State) {
-					ret.set(new LifxState((State) msg.mPayload));
-					return true;
-				}
-			}
-			return false;
-		});
-		
-		socket.close();
-		
-		return ret.get();
+	public Response getState(
+			@ApiParam( value = "Light selector", required = true )
+			@PathParam("selector") String selector) throws IOException {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light == null) {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
+		State state = LifxServer.INSTANCE.send(light, new Get(), State.class);
+		if (state != null) {
+			return Response.ok()
+					.entity(new LifxState(state))
+					.build();
+		} else {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+	}
+	
+	@PUT
+	@Path("{selector}/color")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Set light color",
+			httpMethod = "PUT",
+			consumes = "application/json")
+	public Response setColor(
+			@ApiParam( value = "Light selector", required = true ) @PathParam("selector") String selector,
+			@ApiParam( value = "Set color description", required = true ) LifxSetColor desc) throws IOException {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light != null) {
+			light.setColor(desc.color.toHSBK(), desc.duration);
+			return Response.ok().build();
+		} else {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
+	}
+	
+	@PUT
+	@Path("{selector}/power")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Set light power",
+			httpMethod = "PUT",
+			consumes = "application/json")
+	public Response setPower(
+			@ApiParam( value = "Light selector", required = true ) @PathParam("selector") String selector,
+			@ApiParam( value = "Set color description", required = true ) LifxSetPower desc) throws IOException {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light != null) {
+			light.setPower(desc.power);
+			return Response.ok().build();
+		} else {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
 	}
 }

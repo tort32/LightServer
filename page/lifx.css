@@ -1,0 +1,178 @@
+div {
+	font-family: sans-serif;
+}
+
+#top {
+	width: *;
+    margin: 10px;
+	padding-left: 50px;
+}
+
+#conetnt {
+	margin: 10px;
+	padding-left: 50px;
+}
+
+#bottom {
+	clear: both;
+	width: *;
+    margin: 10px;
+	font-size: 10px;
+	padding-left: 50px;
+}
+
+#leftMenu {
+	float: left;
+	padding: 10px;
+}
+
+#buttonDiscover {
+	clear: both;
+	float: left;
+	margin: 10px;
+	border-radius: 10px;
+	color: #ffffff;
+	font-size: 20px;
+	background: #70ad47;
+	padding: 10px 20px 10px 20px;
+	display: block;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+#buttonDiscover:hover {
+	background: #82c452;
+	text-decoration: none;
+}
+
+.bulbList {
+	width: 350px;
+	height: 200px;
+	padding: 20px;
+	overflow: scroll;
+	overflow-x: auto;
+	overflow-y: auto;
+	border: 1px solid black;
+	border-radius: 20px;
+}
+
+.bulbItemTemplate {
+	clear: both;
+	visibility: hidden;
+}
+
+.bulbItem {
+	margin-bottom: 4px;
+	height: 20px;
+	clear: both;
+	cursor: pointer;
+}
+
+.bulbItem:hover {
+	background-color: lightblue;
+}
+
+.selectedBulbItem {
+	background-color: lightgreen;
+}
+
+#bulbIcon {
+	background-image: url(bulb.png);
+	height: 20px;
+	width: 20px;
+	clear: both;
+	float: left;
+	margin-right: 5px;
+}
+
+#bulbName {
+	float: left;
+	vertical-align: middle;
+}
+
+#bulbRemove {
+	background-image: url(remove.png);
+	height: 20px;
+	width: 20px;
+	float: right;
+}
+
+#bulbAdd {
+	background-image: url(add.png);
+	height: 20px;
+	width: 20px;
+	clear: both;
+	float: left;
+	margin-right: 5px;
+}
+
+#rightMenu {
+	float: left;
+	padding: 10px;
+}
+
+#state {
+	float: left;
+	padding: 10px;
+	margin-bottom: 20px;
+	border: 1px solid black;
+	border-radius: 20px;
+}
+
+#info {
+	clear: both;
+	float: left;
+}
+
+.bulbLabel {
+	margin: 5px;
+	clear: both;
+	border-radius: 10px;
+	background: #cccccc;
+	padding: 5px 10px 5px 10px;
+	display: block;
+}
+
+.bulbColor {
+	clear: both;
+	float: left;
+	width: 100px;
+	height: 75px;
+	border-radius: 10px;
+	margin: 5px;
+	border: 1px solid black;
+}
+
+#controls {
+	float: left;
+	padding: 15px;
+}
+
+.controlLabel {
+	clear: both;
+	float: left;
+}
+
+.controlSlider {
+	float: left;
+}
+
+.controlValue {
+	float: right;
+}
+
+#options {
+	float: left;
+	clear: both;
+	padding: 10px;
+	border: 1px solid black;
+	border-radius: 20px;
+}
+
+.colorOption {
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	margin: 5px;
+	float: left;
+}

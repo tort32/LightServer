@@ -1,4 +1,4 @@
-package com.github.tort32.lifx;
+package com.github.tort32.lifx.server;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
