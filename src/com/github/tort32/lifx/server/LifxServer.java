@@ -87,6 +87,10 @@ public class LifxServer {
 		return lightsMap.values();
 	}
 	
+	public Collection<Light> getLights() {
+		return lightsMap.values();
+	}
+	
 	public Light getLight(String mac) {
 		return lightsMap.get(mac);
 	}
@@ -110,12 +114,12 @@ public class LifxServer {
 		synchronized(socket) {
 			byte[] send = message.toArray();
 			DatagramPacket sendPacket = new DatagramPacket(send, send.length, light.ip, light.port);
-			socket.send(sendPacket);	
+			socket.send(sendPacket);
 			if (responseType == null) {
 				return null;
 			}
 			return recieve(message, responseType);
-		}  
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -1,73 +1,9 @@
-var lifxBulbs;
 var curBulb = null;
 
-function loadLifxBilbs() {
-	var data = localStorage['lifxBulbs'];
-	if (typeof(data) == 'undefined' || data === null) return [];
-	return JSON.parse(data);
-}
-
-function saveLifxBilbs(bulbs) {
-	localStorage.setItem('lifxBulbs', JSON.stringify(bulbs));
-}
-
-function selectBulb(event) {
-	curBulb = event.data;
-	$('#bulbList .bulbItem').removeClass('selectedBulbItem');
-	$("#" + curBulb.mac).addClass('selectedBulbItem');
-	getLightState(curBulb);
-}
-
-function addBulb(event) {
-	var bulb = event.data;
-	// Remove if already added
-	lifxBulbs = jQuery.grep(lifxBulbs, function (item, index) { return item.mac != bulb.mac; });
-	// Add item
-	lifxBulbs.push(bulb);
-	saveLifxBilbs(lifxBulbs);
-	updateBulbList(lifxBulbs);
-}
-
-function removeBulb(event) {
-	var bulb = event.data;
-	// Remove item by mac
-	lifxBulbs = jQuery.grep(lifxBulbs, function (item, index) { return item.mac != bulb.mac; });
-	saveLifxBilbs(lifxBulbs);
-	updateBulbList(lifxBulbs);
-}
-
-function updateBulbList(bulbs) {
-	$('#bulbList .bulbItem').remove(); // remove all items
-	for (var i in bulbs) {
-		var bulb = bulbs[i];
-		var bulbElement = $('#bulbTemplate').clone(true);
-		bulbElement.removeClass("bulbItemTemplate").addClass("bulbItem");
-		bulbElement.attr('id', bulb.mac);
-		var name = bulb.mac + " " + bulb.ip + ":" + bulb.port;
-		bulbElement.find("#bulbName").text(name).click(bulb, selectBulb);
-		bulbElement.find("#bulbRemove").click(bulb, removeBulb);
-		bulbElement.appendTo('#bulbList');
-	}
-}
-
-function updateDiscoverBulbList(bulbs) {
-	$('#discoverBulbList .bulbItem').remove(); // remove all items
-	for (var i in bulbs) {
-		var bulb = bulbs[i];
-		var bulbElement = $('#bulbDiscoverTemplate').clone(true);
-		bulbElement.removeClass("bulbItemTemplate").addClass("bulbItem");
-		bulbElement.attr('id', bulb.mac);
-		var name = bulb.mac + " " + bulb.ip + ":" + bulb.port;
-		bulbElement.find("#bulbName").text(name);
-		bulbElement.click(bulb, addBulb);
-		bulbElement.appendTo('#discoverBulbList');
-	}
-}
-
-function discoverLights() {
+function discoverLifxBulbs() {
 	$.get("/api/lifx/discover",
 		function(bulbs) {
-			updateDiscoverBulbList(bulbs);
+			updateBulbList(bulbs);
 		});
 	/*var bulbs = [
 		{mac:"0B281E50A054", ip:"127.0.1.7", port:56700},
@@ -81,8 +17,8 @@ function discoverLights() {
 		{mac:"0B281E50A062", ip:"127.0.1.12", port:56700},
 		{mac:"0B281E50A063", ip:"127.254.254.254", port:56700}
 	];
-	updateDiscoverBulbList(bulbs);*/
-};
+	updateBulbList(bulbs);*/
+}
 
 function getLightState(bulb) {
 	$.get("/api/lifx/" + bulb.mac + "/state",
@@ -99,7 +35,7 @@ function getLightState(bulb) {
 	  "power": true,
 	  "label": "test label\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
 	};
-	updateState(state.label, state.power, state.color);*/
+	updateState(state.color, state.power, state.label);*/
 };
 
 function setLightColor(bulb, h, s, b, k) {
@@ -134,6 +70,30 @@ function setLightPower(bulb, power) {
 		contentType: "application/json; charset=utf-8",
 		data: JSON.stringify(setPower)
     });
+}
+
+function selectBulb(event) {
+	curBulb = event.data;
+	$('#bulbList .bulbItem').removeClass('selectedBulbItem');
+	$("#" + curBulb.mac).addClass('selectedBulbItem');
+	getLightState(curBulb);
+}
+
+function updateBulbList(bulbs) {
+	$('#bulbList .bulbItem').remove(); // remove all items
+	for (var i in bulbs) {
+		var bulb = bulbs[i];
+		var bulbElement = $('#bulbTemplate').clone(true);
+		bulbElement.removeClass("bulbItemTemplate").addClass("bulbItem");
+		bulbElement.attr('id', bulb.mac);
+		var name = bulb.mac + " " + bulb.ip + ":" + bulb.port;
+		bulbElement.find("#bulbName").text(name).click(bulb, selectBulb);
+		bulbElement.appendTo('#bulbList');
+	}
+	// Select first item
+	if(bulbs.length > 0) {
+		selectBulb({data: bulbs[0]});
+	}
 }
 
 function updateState(color, power, label) {
@@ -233,7 +193,5 @@ function setKelvin(val) {
 
 $(function () {
 	// Page loaded
-	$('#buttonDiscover').click(discoverLights);
-	lifxBulbs = loadLifxBilbs();
-	updateBulbList(lifxBulbs);
+	discoverLifxBulbs();
 })

@@ -23,37 +23,33 @@ div {
 
 #leftMenu {
 	float: left;
-	padding: 10px;
-}
-
-#buttonDiscover {
 	clear: both;
-	float: left;
-	margin: 10px;
-	border-radius: 10px;
-	color: #ffffff;
-	font-size: 20px;
-	background: #70ad47;
-	padding: 10px 20px 10px 20px;
-	display: block;
-	text-decoration: none;
-	cursor: pointer;
 }
 
-#buttonDiscover:hover {
-	background: #82c452;
-	text-decoration: none;
+#listMenu {
+	float: left;
+	clear: both;
+	margin: 10px;
+	padding: 10px;
+	border: 1px solid black;
+	border-radius: 10px;
+	width: 400px;
 }
 
 .bulbList {
-	width: 350px;
-	height: 200px;
-	padding: 20px;
+	height: 150px;
 	overflow: scroll;
 	overflow-x: auto;
 	overflow-y: auto;
-	border: 1px solid black;
-	border-radius: 20px;
+}
+
+.label {
+	clear: both;
+	border-radius: 5px;
+	background: #cccccc;
+	margin: 0px 0px 10px 0px;
+	padding: 5px 10px 5px 10px;
+	display: block;
 }
 
 .bulbItemTemplate {
@@ -90,47 +86,9 @@ div {
 	vertical-align: middle;
 }
 
-#bulbRemove {
-	background-image: url(remove.png);
-	height: 20px;
-	width: 20px;
-	float: right;
-}
-
-#bulbAdd {
-	background-image: url(add.png);
-	height: 20px;
-	width: 20px;
-	clear: both;
-	float: left;
-	margin-right: 5px;
-}
-
-#rightMenu {
-	float: left;
-	padding: 10px;
-}
-
-#state {
-	float: left;
-	padding: 10px;
-	margin-bottom: 20px;
-	border: 1px solid black;
-	border-radius: 20px;
-}
-
 #info {
 	clear: both;
 	float: left;
-}
-
-.bulbLabel {
-	margin: 5px;
-	clear: both;
-	border-radius: 10px;
-	background: #cccccc;
-	padding: 5px 10px 5px 10px;
-	display: block;
 }
 
 .bulbColor {
@@ -161,12 +119,17 @@ div {
 	float: right;
 }
 
+#rightMenu {
+	float: left;
+}
+
 #options {
 	float: left;
 	clear: both;
-	padding: 10px;
+	margin: 10px;
+	padding: 5px;
 	border: 1px solid black;
-	border-radius: 20px;
+	border-radius: 10px;
 }
 
 .colorOption {

@@ -1,6 +1,7 @@
 package com.github.tort32.lightserver.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,9 +40,14 @@ public class LifxService {
 			value = "Discover LIFX endpoints",
 			response = LifxEndpoint.class,
 			responseContainer = "List")
-	public List<LifxEndpoint> discover() throws IOException {
+	public List<LifxEndpoint> getEndpoints() throws IOException {
 		List<LifxEndpoint> endpoints = new LinkedList<LifxEndpoint>();
-		for(Light light : LifxServer.INSTANCE.discover()) {
+		Collection<Light> lights = LifxServer.INSTANCE.getLights();
+		if (lights.isEmpty()) {
+			// Try to discover
+			lights = LifxServer.INSTANCE.discover();
+		}
+		for(Light light : lights) {
 			LifxEndpoint endpoint = new LifxEndpoint(light.getIp(), light.getMac(), light.getPort());
 			endpoints.add(endpoint);
 		}
