@@ -1,2 +1,2 @@
 Download 'dist' directory from GitHub project: https://github.com/swagger-api/swagger-ui
-Place content into LightServer/swagger/dist
+Place content into LightServer/src/main/webapp/swagger/dist

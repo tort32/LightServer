@@ -1,6 +1,7 @@
 package com.github.tort32.lightserver;
 
 import java.io.IOException;
+import java.security.ProtectionDomain;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
 
@@ -22,10 +23,10 @@ public class LightServer {
 		
 		Server server = new Server(8080);
 		
-		WebAppContext webAppContext = new WebAppContext();
-		webAppContext.setDescriptor(webAppContext + "/WEB-INF/web.xml");
-		webAppContext.setResourceBase(".");
-		webAppContext.setContextPath("/");
+		ProtectionDomain protectionDomain = LightServer.class.getProtectionDomain();
+		String webdir = protectionDomain.getCodeSource().getLocation().toExternalForm();
+		
+		WebAppContext webAppContext = new WebAppContext(webdir, "/");
 		server.setHandler(webAppContext);
 		
 		LifxServer lifxServer = LifxServer.INSTANCE;
