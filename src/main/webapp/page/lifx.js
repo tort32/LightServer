@@ -10,11 +10,11 @@ var current = {
 var updatePickers = function() {}
 
 function discoverLifxBulbs() {
-	/*$.get("/api/lifx/discover",
+	$.get("/api/lifx/discover",
 		function(bulbs) {
 			updateBulbList(bulbs);
-		});*/
-	var bulbs = [
+		});
+	/*var bulbs = [
 		{mac:"0B281E50A054", ip:"127.0.1.7", port:56700},
 		{mac:"0B281E50A055", ip:"127.0.1.8", port:56700},
 		{mac:"0B281E50A056", ip:"127.0.1.9", port:56700},
@@ -26,16 +26,16 @@ function discoverLifxBulbs() {
 		{mac:"0B281E50A062", ip:"127.0.1.12", port:56700},
 		{mac:"0B281E50A063", ip:"127.254.254.254", port:56700}
 	];
-	updateBulbList(bulbs);
+	updateBulbList(bulbs);*/
 }
 
 function readLightState() {
 	if (current.bulb === null) return;
-	/*$.get("/api/lifx/" + current.bulb.mac + "/state",
+	$.get("/api/lifx/" + current.bulb.mac + "/state",
 		function(state) {
 			updateState(state);
-		});*/
-	var state = {
+		});
+	/*var state = {
 	  "color": {
 		"hue": 213,
 		"saturation": 100,
@@ -45,7 +45,7 @@ function readLightState() {
 	  "power": true,
 	  "label": "test label\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
 	};
-	updateState(state);
+	updateState(state);*/
 };
 
 function sendLightColor() {
