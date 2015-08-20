@@ -94,14 +94,15 @@ div {
 .bulbColor {
 	clear: both;
 	float: left;
-	width: 100px;
-	height: 75px;
+	width: 240px;
+	height: 100px;
 	border-radius: 10px;
-	margin: 5px;
+	margin: 10px;
 	border: 1px solid black;
 }
 
 #controls {
+	clear: both;
 	float: left;
 	padding: 15px;
 }
@@ -117,6 +118,33 @@ div {
 
 .controlValue {
 	float: right;
+}
+
+.controlPicker {
+    cursor: crosshair;
+    float: left;
+    margin: 10px;
+}
+
+#huePicker {
+	background-image: url(colordisk.png);
+	background-size: 100% 100%;
+	width: 200px;
+	height: 200px;
+}
+
+#brtPicker {
+	width: 200px;
+	height: 20px;
+	border: 1px solid black;
+}
+
+#klvPicker {
+	background-image: url(kelvin_range.png);
+	background-size: 100% 100%;
+	width: 200px;
+	height: 20px;
+	border: 1px solid black;
 }
 
 #rightMenu {

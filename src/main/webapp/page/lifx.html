@@ -29,10 +29,6 @@
 				</div>
 				<div id="listMenu">
 					<h3 id="currentLabel" class="label">Label</h3>
-					<div id="info">
-						<div id="currentColor" class="bulbColor" style="background-color: #000000"></div>
-						<div id="currentKelvin" class="bulbColor" style="background-color: #ffffff"></div>
-					</div>
 					<div id="controls">
 						<!-- power -->
 						<div class="controlLabel">Power</div>
@@ -64,6 +60,14 @@
 							<input id="kSlider" type="range" min="2500" max="9000" value="6600" onChange="setKelvin(this.value)">
 						</div>
 						<div id="kValue" class="controlValue">6600</div>
+					</div>
+					<div id="info">
+						<div id="currentColor" class="bulbColor" style="background-color: #000000"></div>
+					</div>
+					<div id="controls">
+						<div class="controlLabel">HS</div><div id="huePicker" class="controlPicker"></div>
+						<div class="controlLabel">B</div><canvas id="brtPicker" class="controlPicker"></canvas>
+						<div class="controlLabel">K</div><canvas id="klvPicker" class="controlPicker"></canvas>
 					</div>
 				</div>
 			</div>
