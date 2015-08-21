@@ -7,7 +7,8 @@ var current = {
 	}
 };
 
-var updatePickers = function() {}
+var updatePickers = function() {};
+var updatePreview = function() {};
 
 function discoverLifxBulbs() {
 	$.get("/api/lifx/discover",
@@ -150,6 +151,10 @@ function RGB2COL(c) {
 	return "rgb(" + c.r + "," + c.g + "," + c.b + ")";
 }
 
+function RGBA2COL(c) {
+	return "rgba(" + c.r + "," + c.g + "," + c.b + "," + c.a + ")";
+}
+
 function updateCurrentColorFromSliders(send) {
 	current.state.color.hue = $('#hSlider').val();
 	current.state.color.saturation = $('#sSlider').val();
@@ -162,9 +167,13 @@ function HSBK2RGB(h, s, b, k) {
 	var c = {};
 	var hsb = HSB2RGB(h, s, b);
 	var klv = K2RGB(k);
-	c.r = Math.round(hsb.r * klv.r / 255);
-	c.g = Math.round(hsb.g * klv.g / 255);
-	c.b = Math.round(hsb.b * klv.b / 255);
+	var a = s / 100;
+	var b = 1 - a;
+	// Color components weighted by saturation
+	// Saturation = 100 is not impacted by color temperature
+	c.r = Math.round(hsb.r * a + klv.r * b);
+	c.g = Math.round(hsb.g * a + klv.g * b);
+	c.b = Math.round(hsb.b * a + klv.b * b);
 	return c;
 }
 
@@ -178,8 +187,7 @@ function updateCurrentColor(send) {
 	$('#sSlider').val(col.saturation.toString());
 	$('#bSlider').val(col.brightness.toString());
 	$('#kSlider').val(col.kelvin.toString());
-	var c = RGB2COL(HSBK2RGB(col.hue, col.saturation, col.brightness, col.kelvin));
-	$('#currentColor').css({backgroundColor: c});
+	updatePreview();
 	updatePickers();
 	if (send) {
 		sendLightColor();
@@ -220,10 +228,10 @@ $(function () {
 	// Page loaded
 	discoverLifxBulbs();
 	setControlPickers();
+	setColorPreview();
 })
 
 function setControlPickers() {
-	
 	var huePicker = $('#huePicker');
 	var brtPicker = $('#brtPicker');
 	var klvPicker = $('#klvPicker');
@@ -232,7 +240,11 @@ function setControlPickers() {
 	var brtWidth = Math.floor(brtPicker.width());
 	var brtHeight = Math.floor(brtPicker.height());
 	var klvWidth = Math.floor(klvPicker.width());
-	var klvHeight = Math.floor(klvPicker.height());
+	var klvHeight = Math.floor(klvPicker.height());	
+	
+	// Set size for proper canvas rendering
+	brtPicker[0].width = brtWidth;
+	brtPicker[0].height = brtHeight;
 	
 	pick2hs = function (i, j, size) {
 		var c = {};
@@ -271,10 +283,7 @@ function setControlPickers() {
 		}
 		return imgData;
 	};
-	
-	// Set size for proper canvas rendering
-	brtPicker[0].width = brtWidth;
-	brtPicker[0].height = brtHeight;
+
     var ctx = brtPicker[0].getContext("2d");
 	var imgData = ctx.createImageData(brtWidth, brtHeight);
     imgData = genBrtPicker(imgData, brtWidth, brtHeight);
@@ -307,4 +316,46 @@ function setControlPickers() {
 			current.state.color.kelvin = Math.round(klv);
 			updateCurrentColor(true);
 		});
+}
+
+function setColorPreview() {
+
+	var colPreview = $('#currentColor');
+	var colWidth = Math.round(colPreview.width());
+	var colHeight = Math.round(colPreview.height());
+	var colPosX = colWidth / 2;
+	var colPosY = colHeight / 2;
+	
+	// Set size for proper canvas rendering
+	colPreview[0].width = colWidth;
+	colPreview[0].height = colHeight;
+	
+	var ctx2 = colPreview[0].getContext("2d");
+	var colMaxRadius = Math.max(colWidth, colHeight) / 2;
+	
+	updatePreview = function (col) {
+		var col	= current.state.color;
+		var rad = colMaxRadius * col.brightness / 50;
+		var rad2 = Math.max(rad * 2, 50);
+		var c = HSBK2RGB(col.hue, col.saturation, 100, col.kelvin);
+		c.a = Math.max(col.brightness / 100, 0.5);
+
+		var fill = ctx2.createRadialGradient(colPosX, colPosY, 0, colPosX, colPosY, rad2);
+		fill.addColorStop(0, RGBA2COL(c));
+		fill.addColorStop(1, "transparent");
+		var fill2 = ctx2.createRadialGradient(colPosX, colPosY, 0, colPosX, colPosY, rad * 0.5);
+		c.a = 1;
+		fill2.addColorStop(0, RGBA2COL(c));
+		fill2.addColorStop(1, "transparent");
+		
+		ctx2.fillStyle = 'black';
+		ctx2.globalCompositeOperation = "source-over";
+		ctx2.fillRect(0, 0, colWidth, colHeight);
+		ctx2.fillStyle = fill;
+		ctx2.globalCompositeOperation = "screen";
+		ctx2.fillRect(0, 0, colWidth, colHeight);
+		ctx2.fillStyle = fill2;
+		ctx2.globalCompositeOperation = "screen";
+		ctx2.fillRect(0, 0, colWidth, colHeight);
+	}
 }
