@@ -4,6 +4,10 @@ import com.github.tort32.lifx.protocol.Types.UInt16;
 
 
 public class HSBK {
+	public static int HUE_MAX = 360;
+	public static int SATURATION_MAX = 100;
+	public static int BRIGHTNESS_MAX = 100;
+	
 	public static HSBK Green = new HSBK(120, 100, 100);
 	public static HSBK DarkGreen = new HSBK(120, 100, 10);
 	public static HSBK Red = new HSBK(0, 100, 50);
@@ -15,17 +19,28 @@ public class HSBK {
 	public UInt16 mKelvin = new UInt16(3500); // 16 bits. Range 2500° (warm) to 9000° (cool).
 
 	public static final int LENGTH = 8;
+	
+	public HSBK() {
+		// Empty
+	}
+	
+	public HSBK(HSBK value) {
+		this.mHue.set(value.mHue.getValue());
+		this.mSaturation.set(value.mSaturation.getValue());
+		this.mBrightness.set(value.mBrightness.getValue());
+		this.mKelvin.set(value.mKelvin.getValue());
+	}
 
 	public HSBK(int hue, int saturation, int brigthness)
     {
-      mHue.set((int) ((hue * UInt16.MAX_VALUE) / 360));
-      mSaturation.set((int) ((saturation * UInt16.MAX_VALUE) / 100));
-      mBrightness.set((int) ((brigthness * UInt16.MAX_VALUE) / 100));
+		setHue(hue);
+		setSaturation(saturation);
+		setBrightness(brigthness);
     }
 
 	public HSBK(int hue, int saturation, int brigthness, int kelvin) {
 		this(hue, saturation, brigthness);
-		mKelvin.set(kelvin);
+		setKelvin(kelvin);
 	}
 
 	public HSBK(InBuffer buffer) {
@@ -44,6 +59,22 @@ public class HSBK {
 				.write(mBrightness)
 				.write(mKelvin)
 				.endChunk(HSBK.LENGTH);
+	}
+	
+	public void setHue(int hue) {
+		mHue.set((int) ((hue * UInt16.MAX_VALUE) / 360));
+	}
+	
+	public void setSaturation(int saturation) {
+		mSaturation.set((int) ((saturation * UInt16.MAX_VALUE) / 100));
+	}
+	
+	public void setBrightness(int brigthness) {
+		mBrightness.set((int) ((brigthness * UInt16.MAX_VALUE) / 100));
+	}
+	
+	public void setKelvin(int kelvin) {
+		mKelvin.set(kelvin);
 	}
 	
 	public int getHue() {

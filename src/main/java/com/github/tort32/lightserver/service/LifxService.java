@@ -1,6 +1,7 @@
 package com.github.tort32.lightserver.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +21,14 @@ import com.github.tort32.lifx.light.recieve.State;
 import com.github.tort32.lifx.light.send.Get;
 import com.github.tort32.lifx.server.LifxServer;
 import com.github.tort32.lifx.server.Light;
+import com.github.tort32.lifx.server.animation.AnimationFactory;
+import com.github.tort32.lifx.server.animation.IAnimation;
+import com.github.tort32.lifx.server.animation.IAnimation.AnimationDescriptor;
+import com.github.tort32.lifx.server.animation.IAnimation.AnimationParam;
+import com.github.tort32.lightserver.entity.LifxAnimationDesc;
 import com.github.tort32.lightserver.entity.LifxEndpoint;
+import com.github.tort32.lightserver.entity.LifxSetAnim;
+import com.github.tort32.lightserver.entity.LifxSetAnimParam;
 import com.github.tort32.lightserver.entity.LifxSetColor;
 import com.github.tort32.lightserver.entity.LifxSetPower;
 import com.github.tort32.lightserver.entity.LifxState;
@@ -62,20 +70,21 @@ public class LifxService {
 			httpMethod = "GET",
 			response = LifxState.class)
 	public Response getState(
-			@ApiParam( value = "Light selector", required = true )
-			@PathParam("selector") String selector) throws IOException {
+			@PathParam("selector")
+			@ApiParam(
+					value = "Light selector",
+					required = true)
+			String selector) throws IOException {
 		Light light = LifxServer.INSTANCE.getLight(selector);
 		if (light == null) {
 			return Response.status(Status.BAD_GATEWAY).build();
 		}
 		State state = LifxServer.INSTANCE.send(light, new Get(), State.class);
-		if (state != null) {
-			return Response.ok()
-					.entity(new LifxState(state))
-					.build();
-		} else {
+		if (state == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
+		LifxState ret = new LifxState(state);
+		return Response.ok().entity(ret).build();
 	}
 	
 	@PUT
@@ -86,15 +95,21 @@ public class LifxService {
 			httpMethod = "PUT",
 			consumes = "application/json")
 	public Response setColor(
-			@ApiParam( value = "Light selector", required = true ) @PathParam("selector") String selector,
-			@ApiParam( value = "Set color description", required = true ) LifxSetColor desc) throws IOException {
+			@PathParam("selector")
+			@ApiParam(
+					value = "Light selector",
+					required = true)
+			String selector,
+			@ApiParam(
+					value = "Set color description",
+					required = true)
+			LifxSetColor desc) throws IOException {
 		Light light = LifxServer.INSTANCE.getLight(selector);
-		if (light != null) {
-			light.setColor(desc.color.toHSBK(), desc.duration);
-			return Response.ok().build();
-		} else {
+		if (light == null) {
 			return Response.status(Status.BAD_GATEWAY).build();
 		}
+		light.setColor(desc.color.toHSBK(), desc.duration);
+		return Response.ok().build();
 	}
 	
 	@PUT
@@ -105,14 +120,118 @@ public class LifxService {
 			httpMethod = "PUT",
 			consumes = "application/json")
 	public Response setPower(
-			@ApiParam( value = "Light selector", required = true ) @PathParam("selector") String selector,
-			@ApiParam( value = "Set color description", required = true ) LifxSetPower desc) throws IOException {
+			@PathParam("selector")
+			@ApiParam(
+					value = "Light selector",
+					required = true )
+			String selector,
+			@ApiParam(
+					value = "Set color description",
+					required = true)
+			LifxSetPower desc) throws IOException {
 		Light light = LifxServer.INSTANCE.getLight(selector);
-		if (light != null) {
-			light.setPower(desc.power);
-			return Response.ok().build();
-		} else {
+		if (light == null) {
 			return Response.status(Status.BAD_GATEWAY).build();
 		}
+		light.setPower(desc.power);
+		return Response.ok().build();
+	}
+	
+	@GET
+	@Path("animations")
+	@Produces({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Get list of available light animations",
+			httpMethod = "GET",
+			response = String.class,
+			responseContainer = "List")
+	public Response getAnimations() {
+		List<String> anims = new ArrayList<String>();
+		anims.add(LifxAnimationDesc.NILL_ANIM_NAME);
+		anims.addAll(AnimationFactory.getAnimationNames());
+		return Response.ok(anims).build();
+	}
+	
+	@GET
+	@Path("{selector}/animation")
+	@Produces({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Gat light animation",
+			httpMethod = "GET",
+			response = LifxAnimationDesc.class)
+	public Response getAnimation(
+			@PathParam("selector")
+			@ApiParam(
+					value = "Light selector",
+					required = true)
+			String selector) {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light == null) {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
+		LifxAnimationDesc anim = new LifxAnimationDesc(light.getAnimation());
+		return Response.ok(anim).build();
+	}
+	
+	@PUT
+	@Path("{selector}/animation")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Set light animation",
+			httpMethod = "PUT",
+			consumes = "application/json",
+			response = LifxAnimationDesc.class)
+	public Response setAnimation(
+			@PathParam("selector")
+			@ApiParam(
+					value = "Light selector",
+					required = true)
+			String selector,
+			@ApiParam(
+					value = "Set animation description",
+					required = true)
+			LifxSetAnim desc) {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light == null) {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
+		light.setAnimation(desc.name);
+		LifxAnimationDesc anim = new LifxAnimationDesc(light.getAnimation());
+		return Response.ok().entity(anim).build();
+	}
+	
+	@PUT
+	@Path("{selector}/animation/param")
+	@Consumes({MediaType.APPLICATION_JSON})
+	@ApiOperation(
+			value = "Set light animation param",
+			httpMethod = "PUT",
+			consumes = "application/json")
+	public Response setAnimationParam(
+			@PathParam("selector")
+			@ApiParam(
+				value = "Light selector",
+				required = true)
+			String selector,
+			@ApiParam(
+					value = "Set animation param description",
+					required = true)
+			LifxSetAnimParam desc) {
+		Light light = LifxServer.INSTANCE.getLight(selector);
+		if (light == null) {
+			return Response.status(Status.BAD_GATEWAY).build();
+		}
+		IAnimation anim = light.getAnimation();
+		if (anim == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		AnimationDescriptor animDesc = anim.getDescriptor();
+		AnimationParam param = animDesc.findParamByName(desc.name);
+		if (param == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}
+		param.setValue(desc.value);
+		return Response.ok().build();
 	}
 }

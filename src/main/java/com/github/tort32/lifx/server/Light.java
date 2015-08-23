@@ -10,6 +10,9 @@ import com.github.tort32.lifx.light.recieve.State;
 import com.github.tort32.lifx.light.send.Get;
 import com.github.tort32.lifx.light.send.SetColor;
 import com.github.tort32.lifx.protocol.HSBK;
+import com.github.tort32.lifx.server.animation.AnimationFactory;
+import com.github.tort32.lifx.server.animation.IAnimation;
+import com.github.tort32.lifx.server.animation.LightAnimator;
 
 public class Light {
 	
@@ -17,12 +20,14 @@ public class Light {
 	protected String mac;
 	protected transient InetAddress ip;
 	protected transient int port;
+	protected transient LightAnimator animator;
 	
-	protected Light(LifxServer server, String mac, String ip, int port) throws IOException {
+	Light(LifxServer server, String mac, String ip, int port) throws IOException {
 		this.server = server;
 		this.mac = mac;
 		this.ip = InetAddress.getByName(ip);
 		this.port = port;
+		this.animator = new LightAnimator(this);
 	}
 	
 	public boolean isOnline() throws IOException {
@@ -56,5 +61,14 @@ public class Light {
 	
 	public int getPort() {
 		return port;
+	}
+	
+	public IAnimation getAnimation() {
+		return animator.getAnimation();
+	}
+	
+	public void setAnimation(String animName) {
+		IAnimation anim = AnimationFactory.createAnimationByName(animName);
+		animator.setAnimation(anim);
 	}
 }
