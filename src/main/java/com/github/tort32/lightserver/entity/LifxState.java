@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.tort32.lifx.light.recieve.State;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX light state")
 @XmlRootElement
@@ -16,12 +17,15 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class LifxState {
 
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Current color", required = true)
 	public LifxHSBK color;
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Current power state", required = true)
 	public boolean power;
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Device label", required = true)
 	public String label;
 	
 	protected LifxState() {

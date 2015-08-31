@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.tort32.lifx.protocol.HSBK;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX color")
 @XmlRootElement
@@ -16,15 +17,19 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class LifxHSBK {
 
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Color hue in the range from 0 to 360 degrees", required = true)
 	public int hue; // Range 0° and 360°
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Color saturations in the range from 0 to 100 percents", required = true)
 	public int saturation; // Range 0% to 100%
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Color brightness in the range from 0 to 100 percents", required = true)
 	public int brightness; // Range 0% to 100%
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Color temperature in the range from 2500 to 9000 degrees", required = true)
 	public int kelvin; // Range 2500° (warm) to 9000° (cool).
 	
 	protected LifxHSBK() {

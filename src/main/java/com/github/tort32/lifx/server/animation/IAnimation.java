@@ -96,9 +96,19 @@ public interface IAnimation {
 	}
 	
 	public enum AnimationParamType {
-		CHECKBOX,
-		SLIDER,
-		COMBOBOX,
+		CHECKBOX("checkbox"),
+		SLIDER("range"),
+		COMBOBOX("select");
+		
+		private String value;
+		
+		private AnimationParamType(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return this.value;
+		};
 	}
 	
 	String getName();

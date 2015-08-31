@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.tort32.lifx.server.animation.IAnimation.AnimationParam;
 import com.github.tort32.lifx.server.animation.IAnimation.AnimationParamType;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX light animation parameter")
 @XmlRootElement
@@ -17,29 +18,40 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class LifxAnimationParam {
 	
 	@XmlElement(required = true)
-	public AnimationParamType type;
+	@ApiModelProperty(value = "Type of parameter", allowableValues="checkbox, range, select", required = true)
+	public String type;
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Name of parameter", required = true)
 	public String name;
 	
 	@XmlElement(required = true)
-	public String curValue;
+	@ApiModelProperty(value = "Description of parameter", required = true)
+	public String desc;
+	
+	@XmlElement(required = true)
+	@ApiModelProperty(value = "Current value", required = true)
+	public String value;
 	
 	@XmlElement(required = false)
-	public String minValue;
+	@ApiModelProperty(value = "Minimal value of range", required = true)
+	public String min;
 	
 	@XmlElement(required = false)
-	public String maxValue;
+	@ApiModelProperty(value = "Maximal value of range", required = true)
+	public String max;
 	
 	@XmlElement(required = false)
+	@ApiModelProperty(value = "Possible value options for selector", required = true)
 	public String[] values;
 	
 	LifxAnimationParam(AnimationParam param) {
-		this.type = param.type;
+		this.type = param.type.getValue();
 		this.name = param.name;
-		this.curValue = param.curValue;
-		this.minValue = param.minValue;
-		this.maxValue = param.maxValue;
+		this.desc = param.desc;
+		this.value = param.curValue;
+		this.min = param.minValue;
+		this.max = param.maxValue;
 		this.values = param.values;
 	}
 }

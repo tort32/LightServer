@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX set power")
 @XmlRootElement
@@ -15,5 +16,6 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class LifxSetPower {
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Power state to set", required = true)
 	public boolean power;
 }

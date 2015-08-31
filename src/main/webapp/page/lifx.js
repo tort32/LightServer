@@ -49,6 +49,56 @@ function readLightState() {
 	updateState(state);*/
 };
 
+function readAnimState() {
+	if (current.bulb === null) return;
+	$.get("/api/lifx/" + current.bulb.mac + "/animation",
+		function(desc) {
+			updateAnimationPanel(desc);
+		});
+	/*var desc = {
+	  "name": "random",
+	  "params": [
+		{
+		  "type": "range",
+		  "name": "duration",
+		  "desc": "Animation step (ms)",
+		  "value": "1000",
+		  "min": "100",
+		  "max": "30000",
+		},
+		{
+		  "type": "range",
+		  "name": "transition",
+		  "desc": "Color transition (ms)",
+		  "value": "100",
+		  "min": "100",
+		  "max": "30000",
+		},
+		{
+		  "type": "range",
+		  "name": "brightness",
+		  "desc": "Color brightness",
+		  "value": "50",
+		  "min": "0",
+		  "max": "100",
+		},
+		{
+		  "type": "checkbox",
+		  "name": "randSaturation",
+		  "desc": "Randomize stauration",
+		  "value": "false",
+		},
+		{
+		  "type": "select",
+		  "name": "selector",
+		  "desc": "Choose one",
+		  "values": ['one', 'two', 'three']
+		}
+	  ]
+	};
+	updateAnimationPanel(desc);*/
+}
+
 function sendLightColor() {
 	if (current.bulb === null) return;
 	var setColor = {
@@ -78,11 +128,29 @@ function sendLightPower() {
     });
 }
 
+function loadAnimations() {
+	$.get("/api/lifx/animations",
+		function(anims) {
+			updateAnimations(anims);
+		});
+	/*var anims = ['none', 'random', 'anim1'];
+	updateAnimations(anims);*/
+}
+
+function updateAnimations(anims) {
+	var animations = $("#animations");
+	$.each(anims, function() {
+		animations.append($("<option />").val(this).text(this));
+	});
+	//animations.change(function() {changeAnim($( this ).val())});
+}
+
 function selectBulb(event) {
 	current.bulb = event.data;
 	$('#bulbList .bulbItem').removeClass('selectedBulbItem');
 	$("#" + current.bulb.mac).addClass('selectedBulbItem');
 	readLightState();
+	readAnimState();
 }
 
 function updateBulbList(bulbs) {
@@ -97,7 +165,7 @@ function updateBulbList(bulbs) {
 		bulbElement.appendTo('#bulbList');
 	}
 	// Select first item
-	if(bulbs.length > 0) {
+	if (bulbs.length > 0) {
 		selectBulb({data: bulbs[0]});
 	}
 }
@@ -108,6 +176,86 @@ function updateState(state) {
 	$('#powerValue').text(state.power ? "On" : "Off");
 	$('#currentLabel').html(state.label);
 	updateCurrentColor(false);
+}
+
+function updateAnimationPanel(desc) {
+	$("#animations").change(function() {});
+	$("#animations").val(desc.name);
+	$("#animations").change(function() {changeAnim($( this ).val())});
+	var panel = $("#animPanel");
+	panel.empty(); // Remove all
+	
+	// TODO use template elements
+	
+	panel.append($("<div />").text(desc.name));
+	for (var i in desc.params) {
+		var param = desc.params[i];
+		panel.append($("<div />").addClass("controlLabel").text(param.desc));
+		if (param.type === "checkbox") {
+			var div = $("<div />", {class: "controlSlider"});
+			var input = $("<input/>", {
+					name: param.name,
+					type: "checkbox"
+				});
+			if (param.value === "true") {
+				input.attr('checked', true);
+			}
+			input.change(function() {changeAnimParam($( this ).attr("name"), $( this ).is(':checked'))});
+			div.append(input);
+			panel.append(div);
+		} else if (param.type === "range") {
+			var div = $("<div />", {class: "controlSlider"});
+			var input = $("<input/>", {
+					name: param.name,
+					type: "range",
+					max: param.max,
+					min: param.min,
+					value: param.value
+				});
+			input.change(function() {changeAnimParam($( this ).attr("name"), $( this ).val())});
+			div.append(input);
+			panel.append(div);
+			panel.append($("<div />").addClass("controlValue").text(param.value));
+		} else if (param.type === "select") {
+			var div = $("<div />", {class: "controlSlider"});
+			var input = $("<select />").attr("name", param.name);
+			input.change(function() {changeAnimParam($( this ).attr("name"), $( this ).val())});
+			$.each(param.values, function() {
+				select.append($("<option />").val(this).text(this));
+			});
+			div.append(input);
+			panel.append(div);
+		}
+	}
+}
+
+function changeAnim(name) {
+	var setAnim = {
+		"name": name,
+	};
+	$.ajax({
+		type: "PUT",
+		url: "/api/lifx/" + current.bulb.mac + "/animation",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data: JSON.stringify(setAnim),
+		success: updateAnimationPanel
+    });
+}
+
+function changeAnimParam(name, value) {
+	var setParam = {
+		"name": name,
+		"value": value
+	};
+	$.ajax({
+		type: "PUT",
+		url: "/api/lifx/" + current.bulb.mac + "/animation/param",
+		dataType: "json",
+		contentType: "application/json; charset=utf-8",
+		data: JSON.stringify(setParam),
+		success: updateAnimationPanel
+    });
 }
 
 function HSB2RGB(h, s, b) {
@@ -195,7 +343,7 @@ function updateCurrentColor(send) {
 }
 
 function updateCurrentPower() {
-	var power = $('#powerChecker').is(':checked');
+	current.state.power = $('#powerChecker').is(':checked');
 	sendLightPower();
 }
 
@@ -229,6 +377,7 @@ $(function () {
 	discoverLifxBulbs();
 	setControlPickers();
 	setColorPreview();
+	loadAnimations();
 })
 
 function setControlPickers() {

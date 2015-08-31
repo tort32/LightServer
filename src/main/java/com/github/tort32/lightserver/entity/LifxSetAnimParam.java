@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX set light animation param")
 @XmlRootElement
@@ -15,8 +16,10 @@ import com.wordnik.swagger.annotations.ApiModel;
 public class LifxSetAnimParam {
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Name of animation parameter", required = true)
 	public String name;
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Param value to set", required = true)
 	public String value;
 }

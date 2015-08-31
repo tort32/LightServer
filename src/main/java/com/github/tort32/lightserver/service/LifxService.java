@@ -35,6 +35,8 @@ import com.github.tort32.lightserver.entity.LifxState;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 
 @Singleton
 @Path("/lifx")
@@ -69,6 +71,10 @@ public class LifxService {
 			value = "Get light state",
 			httpMethod = "GET",
 			response = LifxState.class)
+	@ApiResponses({
+			@ApiResponse(code = 502, message = "Target light is not found"),
+			@ApiResponse(code = 504, message = "No response from the light")
+		})
 	public Response getState(
 			@PathParam("selector")
 			@ApiParam(
@@ -81,7 +87,7 @@ public class LifxService {
 		}
 		State state = LifxServer.INSTANCE.send(light, new Get(), State.class);
 		if (state == null) {
-			return Response.status(Status.NOT_FOUND).build();
+			return Response.status(Status.GATEWAY_TIMEOUT).build();
 		}
 		LifxState ret = new LifxState(state);
 		return Response.ok().entity(ret).build();
@@ -94,6 +100,9 @@ public class LifxService {
 			value = "Set light color",
 			httpMethod = "PUT",
 			consumes = "application/json")
+	@ApiResponses({
+		@ApiResponse(code = 502, message = "Target light is not found")
+	})
 	public Response setColor(
 			@PathParam("selector")
 			@ApiParam(
@@ -119,6 +128,9 @@ public class LifxService {
 			value = "Set light power",
 			httpMethod = "PUT",
 			consumes = "application/json")
+	@ApiResponses({
+		@ApiResponse(code = 502, message = "Target light is not found")
+	})
 	public Response setPower(
 			@PathParam("selector")
 			@ApiParam(
@@ -156,9 +168,12 @@ public class LifxService {
 	@Path("{selector}/animation")
 	@Produces({MediaType.APPLICATION_JSON})
 	@ApiOperation(
-			value = "Gat light animation",
+			value = "Get light animation",
 			httpMethod = "GET",
 			response = LifxAnimationDesc.class)
+	@ApiResponses({
+		@ApiResponse(code = 502, message = "Target light is not found")
+	})
 	public Response getAnimation(
 			@PathParam("selector")
 			@ApiParam(
@@ -182,6 +197,9 @@ public class LifxService {
 			httpMethod = "PUT",
 			consumes = "application/json",
 			response = LifxAnimationDesc.class)
+	@ApiResponses({
+		@ApiResponse(code = 502, message = "Target light is not found")
+	})
 	public Response setAnimation(
 			@PathParam("selector")
 			@ApiParam(
@@ -204,10 +222,16 @@ public class LifxService {
 	@PUT
 	@Path("{selector}/animation/param")
 	@Consumes({MediaType.APPLICATION_JSON})
+	@Produces({MediaType.APPLICATION_JSON})
 	@ApiOperation(
 			value = "Set light animation param",
 			httpMethod = "PUT",
-			consumes = "application/json")
+			consumes = "application/json",
+			response = LifxAnimationDesc.class)
+	@ApiResponses({
+		@ApiResponse(code = 502, message = "Target light is not found"),
+		@ApiResponse(code = 404, message = "Animation param is not found")
+	})
 	public Response setAnimationParam(
 			@PathParam("selector")
 			@ApiParam(
@@ -232,6 +256,7 @@ public class LifxService {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		param.setValue(desc.value);
-		return Response.ok().build();
+		LifxAnimationDesc ret = new LifxAnimationDesc(anim);
+		return Response.ok().entity(ret).build();
 	}
 }

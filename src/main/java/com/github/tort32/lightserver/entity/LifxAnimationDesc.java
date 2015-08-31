@@ -13,6 +13,7 @@ import com.github.tort32.lifx.server.animation.IAnimation;
 import com.github.tort32.lifx.server.animation.IAnimation.AnimationDescriptor;
 import com.github.tort32.lifx.server.animation.IAnimation.AnimationParam;
 import com.wordnik.swagger.annotations.ApiModel;
+import com.wordnik.swagger.annotations.ApiModelProperty;
 
 @ApiModel(value = "LIFX light animation descriptor")
 @XmlRootElement
@@ -23,9 +24,11 @@ public class LifxAnimationDesc {
 	public static final String NILL_ANIM_NAME = "none";
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "Animation name", required = true)
 	public String name;
 	
 	@XmlElement(required = true)
+	@ApiModelProperty(value = "List of animation parameters", required = true)
 	public List<LifxAnimationParam> params;
 	
 	public LifxAnimationDesc(IAnimation anim) {

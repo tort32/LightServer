@@ -4,9 +4,12 @@ import com.github.tort32.lifx.protocol.Types.UInt16;
 
 
 public class HSBK {
-	public static int HUE_MAX = 360;
-	public static int SATURATION_MAX = 100;
-	public static int BRIGHTNESS_MAX = 100;
+	public static final int HUE_MAX = 360;
+	public static final int SATURATION_MAX = 100;
+	public static final int BRIGHTNESS_MAX = 100;
+	public static final int KELVIN_MIN = 2500;
+	public static final int KELVIN_DEFAULT = 3500;
+	public static final int KELVIN_MAX = 9000;
 	
 	public static HSBK Green = new HSBK(120, 100, 100);
 	public static HSBK DarkGreen = new HSBK(120, 100, 10);
@@ -16,7 +19,7 @@ public class HSBK {
 	public UInt16 mHue = new UInt16(0); // 16 bits. Range 0 to 65535. Scaled to between 0° and 360°
 	public UInt16 mSaturation = new UInt16(0); // 16 bits. Range 0 to 65535. Scaled to between 0% and 100%
 	public UInt16 mBrightness = new UInt16(0); // 16 bits. Range 0 to 65535. Scaled to between 0% and 100%
-	public UInt16 mKelvin = new UInt16(3500); // 16 bits. Range 2500° (warm) to 9000° (cool).
+	public UInt16 mKelvin = new UInt16(KELVIN_DEFAULT); // 16 bits. Range 2500° (warm) to 9000° (cool).
 
 	public static final int LENGTH = 8;
 	
