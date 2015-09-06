@@ -39,59 +39,101 @@ public interface IAnimation {
 		}
 	}
 	
-	public class AnimationParam {
+	public abstract class AnimationParam {
 		
-		private static Logger logger = LoggerFactory.getLogger(AnimationFrame.class);
-		
+		private static Logger logger = LoggerFactory.getLogger(AnimationParam.class);
+
 		public AnimationParamType type;
-		public String desc;
 		public String name;
-		public String minValue;
-		public String maxValue;
-		public String curValue;
-		public String[] values;
-		IParamChangeListener listener;
+		public String desc;
 		
-		interface IParamChangeListener {
-			void onChange(String value);
+		protected IChangeListener listener;
+		
+		interface IChangeListener {
+			void onChange();
 		}
 		
-		private AnimationParam(String name, String desc, AnimationParamType type) {
+		AnimationParam(AnimationParamType type, String name, String desc) {
+			this.type = type;
 			this.name = name;
 			this.desc = desc;
-			this.type = type;
 		}
 		
-		AnimationParam(String name, String desc, boolean defaultValue, IParamChangeListener listener) {
-			this(name, desc, AnimationParamType.CHECKBOX);
-			this.curValue = String.valueOf(defaultValue);
+		public void setChangeListener(IChangeListener listener) {
 			this.listener = listener;
 		}
 		
-		AnimationParam(String name, String desc, int minValue, int maxValue, int defaultValue, IParamChangeListener listener) {
-			this(name, desc, AnimationParamType.SLIDER);
-			this.minValue = String.valueOf(minValue);
-			this.maxValue = String.valueOf(maxValue);
-			this.curValue = String.valueOf(defaultValue);
-			this.listener = listener;
+		public void setValue(String newValue) throws IllegalArgumentException {
+			try {
+				setValueInternal(newValue);
+				if (listener != null) {
+					listener.onChange();
+				}
+			} catch (IllegalArgumentException e) {
+				logger.debug("Param '" + name + "' value '" + newValue + "' is invalid", e);
+				throw e;
+			}
 		}
 		
-		AnimationParam(String name, String desc, String[] options, String defaultValue, IParamChangeListener listener) {
-			this(name, desc, AnimationParamType.COMBOBOX);
+		protected abstract void setValueInternal(String value) throws IllegalArgumentException;
+	}
+	
+	public class RangeParam extends AnimationParam {
+		
+		public int curValue;
+		public int minValue;
+		public int maxValue;
+		
+		RangeParam(String name, String desc, int minValue, int maxValue, int defaultValue) {
+			super(AnimationParamType.SLIDER, name, desc);
+			this.minValue = minValue;
+			this.maxValue = maxValue;
+			this.curValue = defaultValue;
+		}
+		
+		public void setValueInternal(String newValue) throws IllegalArgumentException {
+			int value = Integer.parseInt(newValue);
+			if(value < this.minValue || value > this.maxValue) {
+				throw new IllegalArgumentException("Value should be in range (" + this.minValue + ", " + this.maxValue + ")");
+			}
+			this.curValue = value;
+		}
+	}
+	
+	public class CheckerParam extends AnimationParam {
+		
+		public boolean curValue;
+		
+		CheckerParam(String name, String desc, boolean defaultValue) {
+			super(AnimationParamType.CHECKBOX, name, desc);
+			this.curValue = defaultValue;
+		}
+		
+		public void setValueInternal(String newValue) throws IllegalArgumentException {
+			boolean value = Boolean.parseBoolean(newValue);
+			this.curValue = value;
+		}
+	}
+	
+	public class SelectorParam extends AnimationParam {
+		
+		public String curValue;
+		public String[] values;
+		
+		SelectorParam(String name, String desc, String[] options, String defaultValue) {
+			super(AnimationParamType.COMBOBOX, name, desc);
 			this.values = options;
 			this.curValue = defaultValue;
-			this.listener = listener;
 		}
 		
-		public void setValue(String newValue) {
-			this.curValue = newValue;
-			if (listener != null) {
-				try {
-					listener.onChange(newValue);
-				} catch (NumberFormatException e) {
-					logger.debug("Param '" + name + "' value '" + newValue + "' is invalid", e);
+		public void setValueInternal(String newValue) throws IllegalArgumentException {
+			for (String value : values) {
+				if(value.equalsIgnoreCase(newValue)) {
+					this.curValue = newValue;
+					return;
 				}
 			}
+			throw new IllegalArgumentException("Value should be one from possible options");
 		}
 	}
 	

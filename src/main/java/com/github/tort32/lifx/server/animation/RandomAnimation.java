@@ -20,22 +20,18 @@ public class RandomAnimation implements IAnimation {
 		frame = new AnimationFrame();
 		desc = new AnimationDescriptor(NAME);
 		frame.addFrameAnimParams(desc);
-		desc.addParam(new AnimationParam("brightness", "Color brightness",
-				0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS,
-				new AnimationParam.IParamChangeListener() {
-			@Override
-			public void onChange(String value) throws NumberFormatException {
-				RandomAnimation.this.brightness = Integer.parseInt(value);
-			}
-		}));
-		desc.addParam(new AnimationParam("randSaturation", "Randomize stauration",
-				DEFAULT_RAND_SATURATION,
-				new AnimationParam.IParamChangeListener() {
-			@Override
-			public void onChange(String value) throws NumberFormatException {
-				RandomAnimation.this.randSaturation = Boolean.parseBoolean(value);
-			}
-		}));
+		
+		RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS);
+		brightnessParam.setChangeListener(() -> {	
+			RandomAnimation.this.brightness = brightnessParam.curValue;
+		});
+		desc.addParam(brightnessParam);
+		
+		CheckerParam randSaturation = new CheckerParam("randSaturation", "Randomize stauration", DEFAULT_RAND_SATURATION);
+		randSaturation.setChangeListener(() -> {
+			RandomAnimation.this.randSaturation = randSaturation.curValue;
+		});
+		desc.addParam(randSaturation);
 	}
 
 	@Override

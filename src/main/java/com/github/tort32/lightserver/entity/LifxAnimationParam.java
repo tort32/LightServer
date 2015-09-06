@@ -7,7 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.tort32.lifx.server.animation.IAnimation.AnimationParam;
-import com.github.tort32.lifx.server.animation.IAnimation.AnimationParamType;
+import com.github.tort32.lifx.server.animation.IAnimation.CheckerParam;
+import com.github.tort32.lifx.server.animation.IAnimation.RangeParam;
+import com.github.tort32.lifx.server.animation.IAnimation.SelectorParam;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -49,9 +51,18 @@ public class LifxAnimationParam {
 		this.type = param.type.getValue();
 		this.name = param.name;
 		this.desc = param.desc;
-		this.value = param.curValue;
-		this.min = param.minValue;
-		this.max = param.maxValue;
-		this.values = param.values;
+		if (param instanceof CheckerParam) {
+			CheckerParam p = (CheckerParam) param;
+			this.value = String.valueOf(p.curValue);
+		} else if (param instanceof RangeParam) {
+			RangeParam p = (RangeParam) param;
+			this.min = String.valueOf(p.minValue);
+			this.max = String.valueOf(p.maxValue);
+			this.value = String.valueOf(p.curValue);
+		} else if (param instanceof SelectorParam) {
+			SelectorParam p = (SelectorParam) param;
+			this.values = p.values;
+			this.value = String.valueOf(p.curValue);
+		}
 	}
 }

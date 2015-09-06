@@ -230,7 +230,8 @@ public class LifxService {
 			response = LifxAnimationDesc.class)
 	@ApiResponses({
 		@ApiResponse(code = 502, message = "Target light is not found"),
-		@ApiResponse(code = 404, message = "Animation param is not found")
+		@ApiResponse(code = 404, message = "Animation param is not found"),
+		@ApiResponse(code = 406, message = "Animation param value is invalid")
 	})
 	public Response setAnimationParam(
 			@PathParam("selector")
@@ -255,7 +256,11 @@ public class LifxService {
 		if (param == null) {
 			return Response.status(Status.NOT_FOUND).build();
 		}
-		param.setValue(desc.value);
+		try {
+			param.setValue(desc.value);
+		} catch (IllegalArgumentException e) {
+			return Response.status(Status.NOT_ACCEPTABLE).build();
+		}
 		LifxAnimationDesc ret = new LifxAnimationDesc(anim);
 		return Response.ok().entity(ret).build();
 	}
