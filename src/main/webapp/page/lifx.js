@@ -92,7 +92,8 @@ function readAnimState() {
 		  "type": "select",
 		  "name": "selector",
 		  "desc": "Choose one",
-		  "values": ['one', 'two', 'three']
+		  "options": ['one', 'two', 'three'],
+		  "value": "two"
 		}
 	  ]
 	};
@@ -220,8 +221,12 @@ function updateAnimationPanel(desc) {
 			var div = $("<div />", {class: "controlSlider"});
 			var input = $("<select />").attr("name", param.name);
 			input.change(function() {changeAnimParam($( this ).attr("name"), $( this ).val())});
-			$.each(param.values, function() {
-				select.append($("<option />").val(this).text(this));
+			$.each(param.options, function() {
+				var option = $("<option />").val(this).text(this)
+				if (this == param.value) {
+					option.attr("selected", "selected");
+				}
+				input.append(option);
 			});
 			div.append(input);
 			panel.append(div);

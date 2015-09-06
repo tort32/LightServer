@@ -17,21 +17,24 @@ public class AnimationFrame {
 	public static final int DURATION_MAX = 30000;
 	public static final int DEFAULT_DURATION = 1000;
 	
+	public RangeParam durationParam = new RangeParam(DURATION_NAME, DURATION_DESC, DURATION_MIN, DURATION_MAX, DEFAULT_DURATION);
+	public RangeParam transitionParam = new RangeParam(TRANSITION_NAME, TRANSITION_DESC, TRANSITION_MIN, TRANSITION_MAX, DEFAULT_TRANSITION);
+	
 	public HSBK color = new HSBK();
 	public int transition = DEFAULT_TRANSITION; // color transition time in ms
 	public int duration = DEFAULT_DURATION; // frame duration time in ms
 	
+	
+	
 	public void addFrameAnimParams(AnimationDescriptor desc) {
 		// Add duration
-		RangeParam durationParam = new RangeParam(DURATION_NAME, DURATION_DESC, DURATION_MIN, DURATION_MAX, DEFAULT_DURATION);
-		durationParam.setChangeListener(() -> {
-			AnimationFrame.this.duration = durationParam.curValue;
+		durationParam.setChangeListener((newValue) -> {
+			AnimationFrame.this.duration = newValue;
 		});
 		desc.addParam(durationParam);
 		// Add transition
-		RangeParam transitionParam = new RangeParam(TRANSITION_NAME, TRANSITION_DESC, TRANSITION_MIN, TRANSITION_MAX, DEFAULT_TRANSITION);
-		transitionParam.setChangeListener(() -> {
-			AnimationFrame.this.transition = transitionParam.curValue;
+		transitionParam.setChangeListener((newValue) -> {
+			AnimationFrame.this.transition = newValue;
 		});
 		desc.addParam(transitionParam);
 	}

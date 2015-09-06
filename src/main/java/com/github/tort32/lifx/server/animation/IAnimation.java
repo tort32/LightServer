@@ -12,124 +12,162 @@ public interface IAnimation {
 	
 	public class AnimationDescriptor {
 		public String name;
-		public List<AnimationParam> params = new ArrayList<AnimationParam>();
-		private Map<String, AnimationParam> paramsByName = new HashMap<String, AnimationParam>();
+		public List<AnimationParam<?>> params = new ArrayList<AnimationParam<?>>();
+		private Map<String, AnimationParam<?>> paramsByName = new HashMap<String, AnimationParam<?>>();
 		
-		AnimationDescriptor(String name, AnimationParam... params) {
+		protected IParamChangeListener listener;
+		
+		interface IParamChangeListener {
+			void onChange(String name);
+		}
+		
+		AnimationDescriptor(String name) {
 			this.name = name;
-			for(AnimationParam param : params) {
-				addParam(param);
+		}
+		
+		public void setChangeListener(IParamChangeListener listener) {
+			this.listener = listener;
+		}
+		
+		public void addParam(AnimationParam<?>... params) {
+			for(AnimationParam<?> param : params) {
+				this.params.add(param);
+				this.paramsByName.put(param.name, param);
 			}
 		}
 		
-		public void addParam(AnimationParam param) {
-			this.params.add(param);
-			this.paramsByName.put(param.name, param);
-		}
-		
-		public void setParam(String name, String value) {
-			AnimationParam param = findParamByName(name);
-			if (param != null) {
-				param.setValue(value);
+		public void setParam(String name, String value) throws IllegalArgumentException, NullPointerException {
+			AnimationParam<?> param = findParamByName(name);
+			param.setFromString(value);
+			if (listener != null) {
+				listener.onChange(name);
 			}
 		}
 		
-		public AnimationParam findParamByName(String name) {
+		public AnimationParam<?> findParamByName(String name) {
 			return paramsByName.get(name);
 		}
 	}
 	
-	public abstract class AnimationParam {
+	public abstract class AnimationParam<T> {
 		
 		private static Logger logger = LoggerFactory.getLogger(AnimationParam.class);
 
 		public AnimationParamType type;
 		public String name;
 		public String desc;
+		protected T defaultValue;
+		protected T currentValue;
 		
-		protected IChangeListener listener;
+		protected IChangeListener<T> listener;
 		
-		interface IChangeListener {
-			void onChange();
+		interface IChangeListener<T> {
+			void onChange(T newValue);
 		}
 		
-		AnimationParam(AnimationParamType type, String name, String desc) {
+		AnimationParam(AnimationParamType type, String name, String desc, T defaultValue) {
 			this.type = type;
 			this.name = name;
 			this.desc = desc;
+			this.currentValue = this.defaultValue = defaultValue;
 		}
 		
-		public void setChangeListener(IChangeListener listener) {
+		public void setChangeListener(IChangeListener<T> listener) {
 			this.listener = listener;
 		}
 		
-		public void setValue(String newValue) throws IllegalArgumentException {
+		public void reset() {
+			set(defaultValue);
+		}
+		
+		public void setFromString(String newValue) throws IllegalArgumentException {
 			try {
-				setValueInternal(newValue);
-				if (listener != null) {
-					listener.onChange();
-				}
+				T value = parse(newValue);
+				set(value);
 			} catch (IllegalArgumentException e) {
 				logger.debug("Param '" + name + "' value '" + newValue + "' is invalid", e);
 				throw e;
 			}
 		}
 		
-		protected abstract void setValueInternal(String value) throws IllegalArgumentException;
+		public void set(T newValue) throws IllegalArgumentException {
+			validate(newValue);
+			currentValue = newValue;
+			if (listener != null) {
+				listener.onChange(newValue);
+			}
+		}
+		
+		public T get() {
+			return currentValue;
+		}
+		
+		@SuppressWarnings("unchecked")
+		protected T parse(String value) {
+			if (currentValue instanceof String) {
+				return (T) value;
+			} else if (currentValue instanceof Integer) {
+				return (T) (Integer) Integer.parseInt(value);
+			} else if (currentValue instanceof Boolean) {
+				return (T) (Boolean) Boolean.parseBoolean(value);
+			} else if (currentValue instanceof Float) {
+				return (T) (Float) Float.parseFloat(value);
+			}
+			throw new RuntimeException("Not supported type");
+		}
+		
+		protected abstract void validate(T value) throws IllegalArgumentException;
 	}
 	
-	public class RangeParam extends AnimationParam {
+	public class RangeParam extends AnimationParam<Integer> {
 		
-		public int curValue;
 		public int minValue;
 		public int maxValue;
 		
 		RangeParam(String name, String desc, int minValue, int maxValue, int defaultValue) {
-			super(AnimationParamType.SLIDER, name, desc);
+			super(AnimationParamType.SLIDER, name, desc, defaultValue);
 			this.minValue = minValue;
 			this.maxValue = maxValue;
-			this.curValue = defaultValue;
 		}
 		
-		public void setValueInternal(String newValue) throws IllegalArgumentException {
-			int value = Integer.parseInt(newValue);
+		public void validate(Integer value) throws IllegalArgumentException {
+			if (value == null) {
+				throw new IllegalArgumentException("Value should be not null");
+			}
 			if(value < this.minValue || value > this.maxValue) {
 				throw new IllegalArgumentException("Value should be in range (" + this.minValue + ", " + this.maxValue + ")");
 			}
-			this.curValue = value;
 		}
 	}
 	
-	public class CheckerParam extends AnimationParam {
-		
-		public boolean curValue;
-		
+	public class CheckerParam extends AnimationParam<Boolean> {
+
 		CheckerParam(String name, String desc, boolean defaultValue) {
-			super(AnimationParamType.CHECKBOX, name, desc);
-			this.curValue = defaultValue;
+			super(AnimationParamType.CHECKBOX, name, desc, defaultValue);
 		}
 		
-		public void setValueInternal(String newValue) throws IllegalArgumentException {
-			boolean value = Boolean.parseBoolean(newValue);
-			this.curValue = value;
+		public void validate(Boolean value) throws IllegalArgumentException {
+			if (value == null) {
+				throw new IllegalArgumentException("Value should be not null");
+			}
 		}
 	}
 	
-	public class SelectorParam extends AnimationParam {
+	public class SelectorParam extends AnimationParam<String> {
 		
-		public String curValue;
-		public String[] values;
+		public String[] options;
 		
 		SelectorParam(String name, String desc, String[] options, String defaultValue) {
-			super(AnimationParamType.COMBOBOX, name, desc);
-			this.values = options;
-			this.curValue = defaultValue;
+			super(AnimationParamType.COMBOBOX, name, desc, defaultValue);
+			this.options = options;
 		}
 		
-		public void setValueInternal(String newValue) throws IllegalArgumentException {
-			for (String value : values) {
-				if(value.equalsIgnoreCase(newValue)) {
-					this.curValue = newValue;
+		public void validate(String value) throws IllegalArgumentException {
+			if (value == null) {
+				throw new IllegalArgumentException("Value should be not null");
+			}
+			for (String option : options) {
+				if (option.equalsIgnoreCase(value)) {
 					return;
 				}
 			}

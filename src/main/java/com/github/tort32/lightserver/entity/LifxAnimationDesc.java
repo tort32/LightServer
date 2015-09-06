@@ -32,11 +32,11 @@ public class LifxAnimationDesc {
 	public List<LifxAnimationParam> params;
 	
 	public LifxAnimationDesc(IAnimation anim) {
-		if(anim != null) {
+		if (anim != null) {
 			AnimationDescriptor desc = anim.getDescriptor();
 			this.name = desc.name;
 			this.params = new ArrayList<LifxAnimationParam>();
-			for(AnimationParam param : desc.params) {
+			for (AnimationParam<?> param : desc.params) {
 				params.add(new LifxAnimationParam(param));
 			}
 		} else {

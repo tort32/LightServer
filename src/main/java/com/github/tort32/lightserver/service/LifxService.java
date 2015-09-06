@@ -252,12 +252,10 @@ public class LifxService {
 			return Response.status(Status.NOT_FOUND).build();
 		}
 		AnimationDescriptor animDesc = anim.getDescriptor();
-		AnimationParam param = animDesc.findParamByName(desc.name);
-		if (param == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
 		try {
-			param.setValue(desc.value);
+			animDesc.setParam(desc.name, desc.value);
+		} catch(NullPointerException e) {
+			return Response.status(Status.NOT_FOUND).build();
 		} catch (IllegalArgumentException e) {
 			return Response.status(Status.NOT_ACCEPTABLE).build();
 		}

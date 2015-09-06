@@ -10,6 +10,9 @@ public class RandomAnimation implements IAnimation {
 	private static final int DEFAULT_BRIGHTNESS = 50;
 	private static final boolean DEFAULT_RAND_SATURATION = false;
 	
+	protected RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS);
+	protected CheckerParam randSatParam = new CheckerParam("randSaturation", "Randomize stauration", DEFAULT_RAND_SATURATION);
+	
 	private final AnimationDescriptor desc;
 	private AnimationFrame frame;
 	private int brightness = DEFAULT_BRIGHTNESS;
@@ -21,17 +24,13 @@ public class RandomAnimation implements IAnimation {
 		desc = new AnimationDescriptor(NAME);
 		frame.addFrameAnimParams(desc);
 		
-		RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS);
-		brightnessParam.setChangeListener(() -> {	
-			RandomAnimation.this.brightness = brightnessParam.curValue;
+		brightnessParam.setChangeListener((newValue) -> {	
+			RandomAnimation.this.brightness = newValue;
 		});
-		desc.addParam(brightnessParam);
-		
-		CheckerParam randSaturation = new CheckerParam("randSaturation", "Randomize stauration", DEFAULT_RAND_SATURATION);
-		randSaturation.setChangeListener(() -> {
-			RandomAnimation.this.randSaturation = randSaturation.curValue;
+		randSatParam.setChangeListener((newValue) -> {
+			RandomAnimation.this.randSaturation = newValue;
 		});
-		desc.addParam(randSaturation);
+		desc.addParam(brightnessParam, randSatParam);
 	}
 
 	@Override

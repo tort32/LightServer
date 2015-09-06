@@ -45,24 +45,24 @@ public class LifxAnimationParam {
 	
 	@XmlElement(required = false)
 	@ApiModelProperty(value = "Possible value options for selector", required = true)
-	public String[] values;
+	public String[] options;
 	
-	LifxAnimationParam(AnimationParam param) {
+	LifxAnimationParam(AnimationParam<?> param) {
 		this.type = param.type.getValue();
 		this.name = param.name;
 		this.desc = param.desc;
 		if (param instanceof CheckerParam) {
 			CheckerParam p = (CheckerParam) param;
-			this.value = String.valueOf(p.curValue);
+			this.value = String.valueOf(p.get());
 		} else if (param instanceof RangeParam) {
 			RangeParam p = (RangeParam) param;
 			this.min = String.valueOf(p.minValue);
 			this.max = String.valueOf(p.maxValue);
-			this.value = String.valueOf(p.curValue);
+			this.value = String.valueOf(p.get());
 		} else if (param instanceof SelectorParam) {
 			SelectorParam p = (SelectorParam) param;
-			this.values = p.values;
-			this.value = String.valueOf(p.curValue);
+			this.options = p.options;
+			this.value = String.valueOf(p.get());
 		}
 	}
 }

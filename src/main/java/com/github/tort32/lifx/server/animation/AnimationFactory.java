@@ -51,5 +51,6 @@ public class AnimationFactory {
 	
 	static {
 		registerAnimation(RandomAnimation.class);
+		registerAnimation(ColorCycleAnimation.class);
 	}
 }
