@@ -6,9 +6,9 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.junit.Test;
 
-import com.github.tort32.lifx.device.send.GetService;
-import com.github.tort32.lifx.light.recieve.State;
-import com.github.tort32.lifx.protocol.message.Message;
+import com.github.tort32.api.lifx.protocol.device.send.GetService;
+import com.github.tort32.api.lifx.protocol.light.recieve.State;
+import com.github.tort32.api.lifx.protocol.message.Message;
 
 public class MessageTest {
 

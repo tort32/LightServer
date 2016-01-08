@@ -6,10 +6,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
-import com.github.tort32.lifx.device.send.SetPower;
-import com.github.tort32.lifx.protocol.Types;
-import com.github.tort32.lifx.protocol.message.Message;
-import com.github.tort32.lifx.protocol.message.Payload;
+import com.github.tort32.api.lifx.protocol.Types;
+import com.github.tort32.api.lifx.protocol.device.send.SetPower;
+import com.github.tort32.api.lifx.protocol.message.Message;
+import com.github.tort32.api.lifx.protocol.message.Payload;
 
 public class ProtocolTest {
 	public static void main(String[] args) throws IOException {

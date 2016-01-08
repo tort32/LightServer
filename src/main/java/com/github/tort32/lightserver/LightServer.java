@@ -10,8 +10,10 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.tort32.lifx.server.LifxServer;
-import com.github.tort32.lifx.server.Light;
+import com.github.tort32.api.lifx.server.LifxLight;
+import com.github.tort32.api.lifx.server.LifxServer;
+import com.github.tort32.api.nodemcu.server.EspLight;
+import com.github.tort32.api.nodemcu.server.EspServer;
 
 public class LightServer {
 	
@@ -34,9 +36,9 @@ public class LightServer {
 			logger.info("LifxServer starting ...");
 			lifxServer.start();
 			logger.info("LifxServer discover ...");
-			Collection<Light> lights = lifxServer.discover();
+			Collection<LifxLight> lights = lifxServer.discover();
 			if(!lights.isEmpty()) {
-				for(Light light : lights) {
+				for(LifxLight light : lights) {
 					logger.info("Found Lifx device " + light.getMac() + " at " + light.getIp() + ":" + light.getPort());
 				}
 			} else {
@@ -46,6 +48,24 @@ public class LightServer {
 			logger.info("LifxServer started");
 		} catch(IOException e) {
 			throw new RuntimeException("Can't start LifxServer", e);
+		}
+		EspServer espServer = EspServer.INSTANCE;
+		try {
+			logger.info("EspServer starting ...");
+			espServer.start();
+			logger.info("EspServer discover ...");
+			Collection<EspLight> lights = espServer.discover();
+			if(!lights.isEmpty()) {
+				for(EspLight light : lights) {
+					logger.info("Found EPS8266 device " + light.getMac() + " at " + light.getIp() + ":" + light.getPort());
+				}
+			} else {
+				logger.error("No EPS8266 devices found!");
+			}
+			
+			logger.info("EspServer started");
+		} catch(IOException e) {
+			throw new RuntimeException("Can't start EspServer", e);
 		}
 		
 		try {

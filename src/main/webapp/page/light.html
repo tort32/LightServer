@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Bulbs control</title>
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="stylesheet" type="text/css" href="light.css">
+	</head>
+	<body>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="light.js"></script>
+		<div id="top">
+			<img src="lifx_logo.png" height="64px" />
+			<img src="nodemcu_logo.png" height="64px" />
+			<h2>Powered by Bulbs REST API</h2>
+			<noscript><h3>Sorry, your browser does not support JavaScript!</h3></noscript>
+		</div>
+		
+		<div id="bulbTemplate" class="bulbItemTemplate">
+			<div id="bulbIcon"></div>
+			<div id="bulbName"></div>
+			<div id="bulbAddress"></div>
+		</div>
+		
+		<div id="content">
+			<div id="leftMenu">
+				<div id="listMenu">
+					<h3 class="label">Bulbs</h3>
+					<div id="bulbList" class="bulbList"></div>
+				</div>
+				<div id="listMenu">
+					<h3 id="currentLabel" class="label">Label</h3>
+					<div id="controls">
+						<!-- power -->
+						<div class="controlLabel">Power</div>
+						<div class="controlSlider">
+							<input id="powerChecker" type="checkbox" onChange="setPower(this.checked)">
+						</div>
+						<div id="powerValue" class="controlValue">Off</div>
+						<!-- hue -->
+						<div class="controlLabel">H</div>
+						<div class="controlSlider">
+							<input id="hSlider" type="range" max="360" min="0" value="0" onChange="setHue(this.value)">
+						</div>
+						<div id="hValue" class="controlValue">0</div>
+						<!-- saturation -->
+						<div class="controlLabel">S</div>
+						<div class="controlSlider">
+							<input id="sSlider" type="range" min="0" max="100" value="0" onChange="setSaturation(this.value)">
+						</div>
+						<div id="sValue" class="controlValue">0</div>
+						<!-- brightness -->
+						<div class="controlLabel">B</div>
+						<div class="controlSlider">
+							<input id="bSlider" type="range" min="0" max="100" value="0" onChange="setBrightness(this.value)">
+						</div>
+						<div id="bValue" class="controlValue">0</div>
+						<!-- temperature -->
+						<div class="controlLabel">K</div>
+						<div class="controlSlider">
+							<input id="kSlider" type="range" min="2500" max="9000" value="6600" onChange="setKelvin(this.value)">
+						</div>
+						<div id="kValue" class="controlValue">6600</div>
+					</div>
+					<div id="info">
+						<canvas id="currentColor" class="bulbColor" style="background-color: #000000"></canvas>
+					</div>
+					<div id="controls">
+						<div class="controlLabel">HS</div><div id="huePicker" class="controlPicker"></div>
+						<div class="controlLabel">B</div><canvas id="brtPicker" class="controlPicker"></canvas>
+						<div class="controlLabel">K</div><canvas id="klvPicker" class="controlPicker"></canvas>
+					</div>
+				</div>
+			</div>
+			<div id="rightMenu">
+				<div>
+					<select id="animations"></select>
+				</div>
+				<div id="animPanel"></div>
+			</div>
+		</div>
+		<div id="bottom">
+			<p><a href="http://github.com/tort32">github.com/tort32</a></p>
+		</div>
+	</body>
+</html>

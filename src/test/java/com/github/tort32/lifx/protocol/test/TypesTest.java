@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import com.github.tort32.lifx.protocol.MacAddress;
-import com.github.tort32.lifx.protocol.Types.*;
+import com.github.tort32.api.lifx.protocol.MacAddress;
+import com.github.tort32.api.lifx.protocol.Types.*;
 
 public class TypesTest {
 
