@@ -42,7 +42,7 @@ public class EspService {
 	public List<LightEndpoint> getEndpoints() throws IOException {
 		List<LightEndpoint> endpoints = new LinkedList<LightEndpoint>();
 		for(EspLight light : EspServer.INSTANCE.discover()) {
-			LightEndpoint endpoint = new LightEndpoint(light.getIp().getHostAddress(), light.getMac(), light.getPort());
+			LightEndpoint endpoint = new LightEndpoint(light);
 			endpoints.add(endpoint);
 		}
 		return endpoints;

@@ -2,6 +2,7 @@ package com.github.tort32.api.lifx.server;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import com.github.tort32.api.lifx.protocol.HSBK;
 import com.github.tort32.api.lifx.protocol.device.recieve.Acknowledgement;
@@ -19,10 +20,21 @@ import com.github.tort32.common.entity.LightState;
 public class LifxLight extends BaseLight {
 	
 	protected LifxServer server;
+	public String mac;
 	
-	LifxLight(LifxServer server, String mac, InetAddress ip, int port) throws IOException {
-		super(mac, ip, port);
+	LifxLight(LifxServer server, InetAddress ip, int port, String mac) throws IOException {
+		super(new InetSocketAddress(ip, port));
 		this.server = server;
+		this.mac = mac;
+	}
+	
+	public static String getSelector(String mac) {
+		return mac; // just MAC
+	}
+	
+	@Override
+	public String getSelector() {
+		return LifxLight.getSelector(mac);
 	}
 	
 	public boolean isOnline() throws IOException {

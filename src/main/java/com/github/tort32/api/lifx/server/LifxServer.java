@@ -74,8 +74,9 @@ public class LifxServer {
 						InetAddress ip = rcvPacket.getAddress();
 						String mac = rcvMsg.mFrameAddress.mTarget.getHexValue();
 						int port = (int) payload.mPort.getValue();
-						if (!lightsMap.containsKey(mac)) {
-							lightsMap.put(mac, new LifxLight(this, mac, ip, port));
+						String selector = LifxLight.getSelector(mac);
+						if (!lightsMap.containsKey(selector)) {
+							lightsMap.put(selector, new LifxLight(this, ip, port, mac));
 						}
 					}
 				}
@@ -93,8 +94,8 @@ public class LifxServer {
 		return lightsMap.values();
 	}
 	
-	public LifxLight getLight(String mac) {
-		return lightsMap.get(mac);
+	public LifxLight getLight(String selector) {
+		return lightsMap.get(selector);
 	}
 	
 	public void send(LifxLight light, Message message) throws IOException {
@@ -108,14 +109,14 @@ public class LifxServer {
 	public <T extends Payload> T send(LifxLight light, Payload payload, Class<T> responseType) throws IOException {
 		Message msg = new Message(payload);
 		msg.setSource(Message.SENDER_ID);
-		msg.setTarget(light.getMac());
+		msg.setTarget(light.mac);
 		return send(light, msg, responseType);
 	}
 	
 	public <T extends Payload> T send(LifxLight light, Message message, Class<T> responseType) throws IOException {
 		synchronized(socket) {
 			byte[] send = message.toArray();
-			DatagramPacket sendPacket = new DatagramPacket(send, send.length, light.getIp(), light.getPort());
+			DatagramPacket sendPacket = new DatagramPacket(send, send.length, light.getAddress());
 			socket.send(sendPacket);
 			if (responseType == null) {
 				return null;

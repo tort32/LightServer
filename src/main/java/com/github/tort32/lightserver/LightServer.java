@@ -39,7 +39,8 @@ public class LightServer {
 			Collection<LifxLight> lights = lifxServer.discover();
 			if(!lights.isEmpty()) {
 				for(LifxLight light : lights) {
-					logger.info("Found Lifx device " + light.getMac() + " at " + light.getIp() + ":" + light.getPort());
+					logger.info("Found Lifx device " + light.getSelector() + " at " +
+							light.getAddress().getAddress().getHostAddress() + ":" + light.getAddress().getPort());
 				}
 			} else {
 				logger.error("No Lifx devices found!");
@@ -57,10 +58,11 @@ public class LightServer {
 			Collection<EspLight> lights = espServer.discover();
 			if(!lights.isEmpty()) {
 				for(EspLight light : lights) {
-					logger.info("Found EPS8266 device " + light.getMac() + " at " + light.getIp() + ":" + light.getPort());
+					logger.info("Found NodeMCU device " + light.getSelector() + " at " +
+							light.getAddress().getAddress().getHostAddress() + ":" + light.getAddress().getPort());
 				}
 			} else {
-				logger.error("No EPS8266 devices found!");
+				logger.error("No NodeMCU devices found!");
 			}
 			
 			logger.info("EspServer started");

@@ -1,7 +1,7 @@
 package com.github.tort32.common;
 
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import com.github.tort32.common.animation.IAnimation;
 import com.github.tort32.common.entity.LightColor;
@@ -15,11 +15,9 @@ public interface ILight {
 	
 	void setPower(boolean enable) throws IOException;
 	
-	String getMac();
+	String getSelector();
 	
-	InetAddress getIp();
-	
-	int getPort();
+	InetSocketAddress getAddress();
 	
 	IAnimation getAnimation();
 	

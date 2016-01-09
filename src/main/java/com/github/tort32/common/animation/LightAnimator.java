@@ -17,7 +17,7 @@ public class LightAnimator {
 		return (task != null) ? task.anim : null;
 	}
 	
-	public void setAnimation(IAnimation anim) {
+	public synchronized void setAnimation(IAnimation anim) {
 		if (task != null) {
 			task.stop();
 			task = null;
@@ -43,7 +43,7 @@ public class LightAnimator {
 		
 		@Override
 		public void run() {
-			while(isRunning) {
+			while (isRunning) {
 				AnimationFrame frame = anim.getNextFrame();
 				try {
 					light.setColor(frame.color, frame.transition, false);

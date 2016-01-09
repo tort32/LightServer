@@ -18,23 +18,23 @@ function discoverBulbs() {
 			updateBulbList(bulbs);
 		});
 	/*var bulbs = [
-		{mac:"0B281E50A054", ip:"127.0.1.7", port:56700},
-		{mac:"0B281E50A055", ip:"127.0.1.8", port:56700},
-		{mac:"0B281E50A056", ip:"127.0.1.9", port:56700},
-		{mac:"0B281E50A057", ip:"127.0.1.234", port:56700},
-		{mac:"0B281E50A058", ip:"127.0.1.124", port:56700},
-		{mac:"0B281E50A059", ip:"127.0.1.212", port:56700},
-		{mac:"0B281E50A060", ip:"127.0.1.10", port:56700},
-		{mac:"0B281E50A061", ip:"127.0.1.11", port:56700},
-		{mac:"0B281E50A062", ip:"127.0.1.12", port:56700},
-		{mac:"0B281E50A063", ip:"127.254.254.254", port:56700}
+		{selector:"0B281E50A054", ip:"127.0.1.7", port:56700},
+		{selector:"0B281E50A055", ip:"127.0.1.8", port:56700},
+		{selector:"0B281E50A056", ip:"127.0.1.9", port:56700},
+		{selector:"0B281E50A057", ip:"127.0.1.234", port:56700},
+		{selector:"0B281E50A058", ip:"127.0.1.124", port:56700},
+		{selector:"0B281E50A059", ip:"127.0.1.212", port:56700},
+		{selector:"0B281E50A060", ip:"127.0.1.10", port:56700},
+		{selector:"0B281E50A061", ip:"127.0.1.11", port:56700},
+		{selector:"0B281E50A062", ip:"127.0.1.12", port:56700},
+		{selector:"0B281E50A063", ip:"127.254.254.254", port:56700}
 	];
 	updateBulbList(bulbs);*/
 }
 
 function readLightState() {
 	if (current.bulb === null) return;
-	$.get(apiPath + current.bulb.mac + "/state",
+	$.get(apiPath + current.bulb.selector + "/state",
 		function(state) {
 			updateState(state);
 		});
@@ -53,7 +53,7 @@ function readLightState() {
 
 function readAnimState() {
 	if (current.bulb === null) return;
-	$.get(apiPath + current.bulb.mac + "/animation",
+	$.get(apiPath + current.bulb.selector + "/animation",
 		function(desc) {
 			updateAnimationPanel(desc);
 		});
@@ -110,7 +110,7 @@ function sendLightColor() {
 	}
 	$.ajax({
 		type: "PUT",
-		url: apiPath + current.bulb.mac + "/color",
+		url: apiPath + current.bulb.selector + "/color",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
 		data: JSON.stringify(setColor)
@@ -124,7 +124,7 @@ function sendLightPower() {
 	}
 	$.ajax({
 		type: "PUT",
-		url: apiPath + current.bulb.mac + "/power",
+		url: apiPath + current.bulb.selector + "/power",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
 		data: JSON.stringify(setPower)
@@ -151,7 +151,7 @@ function updateAnimations(anims) {
 function selectBulb(event) {
 	current.bulb = event.data;
 	$('#bulbList .bulbItem').removeClass('selectedBulbItem');
-	$("#" + current.bulb.mac).addClass('selectedBulbItem');
+	$("#" + current.bulb.selector).addClass('selectedBulbItem');
 	readLightState();
 	readAnimState();
 }
@@ -162,8 +162,8 @@ function updateBulbList(bulbs) {
 		var bulb = bulbs[i];
 		var bulbElement = $('#bulbTemplate').clone(true);
 		bulbElement.removeClass("bulbItemTemplate").addClass("bulbItem");
-		bulbElement.attr('id', bulb.mac);
-		var name = bulb.mac + " " + bulb.ip + ":" + bulb.port;
+		bulbElement.attr('id', bulb.selector);
+		var name = bulb.selector + " " + bulb.ip + ":" + bulb.port;
 		bulbElement.find("#bulbName").text(name).click(bulb, selectBulb);
 		bulbElement.appendTo('#bulbList');
 	}
@@ -242,7 +242,7 @@ function changeAnim(name) {
 	};
 	$.ajax({
 		type: "PUT",
-		url: apiPath + current.bulb.mac + "/animation",
+		url: apiPath + current.bulb.selector + "/animation",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
 		data: JSON.stringify(setAnim),
@@ -257,7 +257,7 @@ function changeAnimParam(name, value) {
 	};
 	$.ajax({
 		type: "PUT",
-		url: apiPath + current.bulb.mac + "/animation/param",
+		url: apiPath + current.bulb.selector + "/animation/param",
 		dataType: "json",
 		contentType: "application/json; charset=utf-8",
 		data: JSON.stringify(setParam),

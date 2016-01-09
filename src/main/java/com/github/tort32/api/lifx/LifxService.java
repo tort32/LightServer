@@ -42,7 +42,7 @@ public class LifxService {
 	public List<LightEndpoint> getEndpoints() throws IOException {
 		List<LightEndpoint> endpoints = new LinkedList<LightEndpoint>();
 		for(LifxLight light : LifxServer.INSTANCE.discover()) {
-			LightEndpoint endpoint = new LightEndpoint(light.getIp().getHostAddress(), light.getMac(), light.getPort());
+			LightEndpoint endpoint = new LightEndpoint(light);
 			endpoints.add(endpoint);
 		}
 		return endpoints;

@@ -13,9 +13,11 @@ public class UdpTest {
 	public static void main(String[] args) throws IOException {
 		
 		DatagramSocket socket = new DatagramSocket();
-		socket.setSoTimeout(5000);
+		socket.setSoTimeout(1000);
 		
-		String sndMsg = "S123,234,345";
+		//String sndMsg = "S123,234,345";
+		//String sndMsg = "B";
+		String sndMsg = "SB,255,0,0";
 		
 		System.out.println("Send: >" + sndMsg + "<");
 		

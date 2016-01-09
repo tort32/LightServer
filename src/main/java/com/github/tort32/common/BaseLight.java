@@ -1,7 +1,7 @@
 package com.github.tort32.common;
 
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import com.github.tort32.common.animation.AnimationFactory;
 import com.github.tort32.common.animation.IAnimation;
@@ -9,31 +9,17 @@ import com.github.tort32.common.animation.LightAnimator;
 
 public abstract class BaseLight implements ILight {
 	
-	protected String mac;
-	protected transient InetAddress ip;
-	protected transient int port;
+	protected transient InetSocketAddress address;
 	protected transient LightAnimator animator;
 	
-	protected BaseLight(String mac, InetAddress ip, int port) throws IOException {
-		this.mac = mac;
-		this.ip = ip;
-		this.port = port;
+	protected BaseLight(InetSocketAddress address) throws IOException {
+		this.address = address;
 		this.animator = new LightAnimator(this);
 	}
 	
 	@Override
-	public String getMac() {
-		return mac;
-	}
-	
-	@Override
-	public InetAddress getIp() {
-		return ip;
-	}
-	
-	@Override
-	public int getPort() {
-		return port;
+	public InetSocketAddress getAddress() {
+		return address;
 	}
 	
 	@Override

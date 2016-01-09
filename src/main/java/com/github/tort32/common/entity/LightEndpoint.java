@@ -6,6 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.tort32.common.ILight;
 import com.wordnik.swagger.annotations.ApiModel;
 import com.wordnik.swagger.annotations.ApiModelProperty;
 
@@ -14,14 +15,14 @@ import com.wordnik.swagger.annotations.ApiModelProperty;
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonInclude(JsonInclude.Include.NON_NULL) 
 public class LightEndpoint {
+	
+	@XmlElement(required = true)
+	@ApiModelProperty( value = "Device selector", required = true )
+	public String selector;
 
 	@XmlElement(required = true)
 	@ApiModelProperty( value = "Device service IP", required = true )
 	public String ip;
-	
-	@XmlElement(required = true)
-	@ApiModelProperty( value = "Device MAC", required = true )
-	public String mac;
 
 	@XmlElement(required = true)
 	@ApiModelProperty( value = "Device service port", required = true )
@@ -31,10 +32,9 @@ public class LightEndpoint {
 		// Empty
 	}
 
-	public LightEndpoint(String ip, String mac, int port) {
-		this.ip = ip;
-		this.mac = mac;
-		this.port = port;
+	public LightEndpoint(ILight light) {
+		this.selector = light.getSelector();
+		this.ip = light.getAddress().getAddress().getHostAddress();
+		this.port = light.getAddress().getPort();
 	}
-
 }

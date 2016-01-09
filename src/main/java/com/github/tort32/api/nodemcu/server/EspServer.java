@@ -19,7 +19,7 @@ public class EspServer {
 	
 	public static final int SO_TIMEOUT = 500;
 	public static final int BUFFER_SIZE = 64;
-	public static final int DEFAULT_PORT = 34500;
+	public static final int PORT = 34500;
 	
 	private Map<String, EspLight> lightsMap = new HashMap<String, EspLight>();
 	
@@ -34,7 +34,7 @@ public class EspServer {
 	}
 	
 	public void start() throws SocketException {
-		socket = new DatagramSocket(DEFAULT_PORT);
+		socket = new DatagramSocket(PORT);
 		socket.setSoTimeout(SO_TIMEOUT);
 	}
 	
@@ -49,7 +49,7 @@ public class EspServer {
 		String msg = "B"; // Broadcast
 
 		byte[] send = msg.getBytes(StandardCharsets.US_ASCII);
-		DatagramPacket sendPacket = new DatagramPacket(send, send.length, broadcast, DEFAULT_PORT);
+		DatagramPacket sendPacket = new DatagramPacket(send, send.length, broadcast, PORT);
 		socket.send(sendPacket);
 		
 		byte[] buf = new byte[BUFFER_SIZE];
@@ -66,12 +66,14 @@ public class EspServer {
 				// OK 141919 5c:cf:7f:02:2a:5f
 				if(recMsg.startsWith("OK ")) {
 					String[] parts = recMsg.trim().split(" ");
-					if(parts.length == 3) {
+					if(parts.length == 4) {
+						InetAddress ip = rcvPacket.getAddress();
 						String chipId = parts[1];
 						String mac = parts[2].replace(":", "").toUpperCase();
-						InetAddress ip = rcvPacket.getAddress();
-						if (!lightsMap.containsKey(mac)) {
-							lightsMap.put(mac, new EspLight(this, mac, ip, chipId));
+						String endpointName = parts[3];
+						String selector = EspLight.getSelector(mac, endpointName);
+						if (!lightsMap.containsKey(selector)) {
+							lightsMap.put(selector, new EspLight(this, ip, chipId, mac, endpointName));
 						}
 					}
 				}
@@ -89,14 +91,14 @@ public class EspServer {
 		return lightsMap.values();
 	}
 	
-	public EspLight getLight(String mac) {
-		return lightsMap.get(mac);
+	public EspLight getLight(String selector) {
+		return lightsMap.get(selector);
 	}
 	
 	public String send(EspLight light, String payload) throws IOException {
 		synchronized(socket) {
 			byte[] send = payload.getBytes(StandardCharsets.US_ASCII);
-			DatagramPacket sendPacket = new DatagramPacket(send, send.length, light.getIp(), DEFAULT_PORT);
+			DatagramPacket sendPacket = new DatagramPacket(send, send.length, light.getAddress());
 			socket.send(sendPacket);
 			return recieve();
 		}

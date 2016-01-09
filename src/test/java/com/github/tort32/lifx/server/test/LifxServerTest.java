@@ -19,7 +19,7 @@ public class LifxServerTest {
 			Collection<LifxLight> lights = server.discover();
 			for(ILight light : lights) {
 				LightState state = light.getState();
-				System.out.println("Light <" + light.getMac() + "> " + state);
+				System.out.println("Light <" + light.getSelector() + "> " + state);
 			}
 		} catch(RuntimeException | IOException e) {
 			e.printStackTrace();
