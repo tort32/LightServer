@@ -4,8 +4,10 @@ import com.github.tort32.api.lifx.protocol.OutBuffer;
 import com.github.tort32.api.lifx.protocol.Types.*;
 
 public abstract class Payload {
+	
+	// More message types can be found at https://github.com/magicmonkey/lifxjs/blob/master/Protocol.md
+	
 	public int type;
-
 	public int length;
 
 	public static final int OFFSET = Frame.LENGTH + FrameAddress.LENGTH + ProtocolHeader.LENGTH;

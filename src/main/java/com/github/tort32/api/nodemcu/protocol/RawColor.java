@@ -6,6 +6,9 @@ public class RawColor {
 	public static final int RGB_MAX = 255;
 	public static final int DUTY_MAX = 1023;
 	
+	public static final RawColor WHITE = new RawColor(DUTY_MAX, DUTY_MAX, DUTY_MAX);
+	public static final RawColor BLACK = new RawColor(0, 0, 0);
+	
 	public int rawR;
 	public int rawG;
 	public int rawB;
@@ -31,7 +34,7 @@ public class RawColor {
 		this(color.hue, color.saturation, color.brightness, color.kelvin);
 	}
 	
-	public LightColor toLightHSBK() {
+	public LightColor toLightColor() {
 		int r = convertToIntensity(rawR);
 		int g = convertToIntensity(rawG);
 		int b = convertToIntensity(rawB);

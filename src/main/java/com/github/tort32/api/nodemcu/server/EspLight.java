@@ -54,7 +54,7 @@ public class EspLight extends BaseLight {
 			return null;
 		}
 		RawColor color = new RawColor(rawR, rawG, rawB);
-		boolean isOn = (rawR != 0 && rawG != 0 && rawB != 0);
+		boolean isOn = (rawR > 0 || rawG > 0 || rawB > 0);
 		return new LightState(color.toLightColor(), isOn, chipId);
 	}
 	
@@ -66,7 +66,7 @@ public class EspLight extends BaseLight {
 	
 	@Override
 	public void setPower(boolean enable) throws IOException {
-		setValue(new RawColor(), true);
+		setValue(enable ? RawColor.WHITE : RawColor.BLACK, true);
 	}
 	
 	private void setValue(RawColor color, boolean doTcp) throws IOException {
