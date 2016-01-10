@@ -55,7 +55,7 @@ public class EspLight extends BaseLight {
 		}
 		RawColor color = new RawColor(rawR, rawG, rawB);
 		boolean isOn = (rawR != 0 && rawG != 0 && rawB != 0);
-		return new LightState(color.toLightHSBK(), isOn, chipId);
+		return new LightState(color.toLightColor(), isOn, chipId);
 	}
 	
 	@Override
