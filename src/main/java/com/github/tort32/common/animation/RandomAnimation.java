@@ -4,23 +4,20 @@ import java.util.Random;
 
 import com.github.tort32.api.lifx.protocol.HSBK;
 
-public class RandomAnimation implements IAnimation {
+public class RandomAnimation extends BaseAnimation {
 	public static final String NAME = "random";
 	
-	private static final int DEFAULT_BRIGHTNESS = 50;
-	private static final boolean DEFAULT_RAND_SATURATION = false;
+	private static final int BRIGHTNESS_DEFAULT = 50;
+	private static final boolean RAND_SATURATION_DEFAULT = false;
 	
-	protected RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS);
-	protected CheckerParam randSatParam = new CheckerParam("randSaturation", "Randomize stauration", DEFAULT_RAND_SATURATION);
+	protected RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, BRIGHTNESS_DEFAULT);
+	protected CheckerParam randSatParam = new CheckerParam("randSaturation", "Randomize stauration", RAND_SATURATION_DEFAULT);
 	
-	private final AnimationDescriptor desc;
-	private AnimationFrame frame;
-	private int brightness = DEFAULT_BRIGHTNESS;
-	private boolean randSaturation = DEFAULT_RAND_SATURATION;
+	private int brightness = BRIGHTNESS_DEFAULT;
+	private boolean randSaturation = RAND_SATURATION_DEFAULT;
 	private Random rand = new Random();
 	
 	public RandomAnimation() {
-		frame = new AnimationFrame();
 		desc = new AnimationDescriptor(NAME);
 		frame.addFrameAnimParams(desc);
 		
@@ -31,16 +28,6 @@ public class RandomAnimation implements IAnimation {
 			RandomAnimation.this.randSaturation = newValue;
 		});
 		desc.addParam(brightnessParam, randSatParam);
-	}
-
-	@Override
-	public String getName() {
-		return NAME;
-	}
-	
-	@Override
-	public AnimationDescriptor getDescriptor() {
-		return desc;
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class LightServer {
 							light.getAddress().getAddress().getHostAddress() + ":" + light.getAddress().getPort());
 				}
 			} else {
-				logger.error("No Lifx devices found!");
+				logger.warn("No Lifx devices found!");
 			}
 			
 			logger.info("LifxServer started");
@@ -62,7 +62,7 @@ public class LightServer {
 							light.getAddress().getAddress().getHostAddress() + ":" + light.getAddress().getPort());
 				}
 			} else {
-				logger.error("No NodeMCU devices found!");
+				logger.warn("No NodeMCU devices found!");
 			}
 			
 			logger.info("EspServer started");
@@ -83,6 +83,7 @@ public class LightServer {
 		}
 		
 		lifxServer.stop();
+		espServer.stop();
 
 		try {
 			server.stop();

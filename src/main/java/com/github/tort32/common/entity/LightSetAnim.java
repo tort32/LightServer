@@ -1,5 +1,7 @@
 package com.github.tort32.common.entity;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -18,4 +20,8 @@ public class LightSetAnim {
 	@XmlElement(required = true)
 	@ApiModelProperty(value = "Animation name", required = true)
 	public String name;
+	
+	@XmlElement(required = false)
+	@ApiModelProperty(value = "List of animation params", required = false)
+	public List<LightSetAnimParam> params;
 }

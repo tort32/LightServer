@@ -38,7 +38,7 @@ public class EspLight extends BaseLight {
 		String msg = String.format("G%s", endpointName);
 		String result = server.send(this, msg);
 		// OK 123
-		if (!result.startsWith("OK ")) {
+		if (result == null || !result.startsWith("OK ")) {
 			return null;
 		}
 		String[] parts = result.trim().split(" ");
@@ -75,7 +75,7 @@ public class EspLight extends BaseLight {
 			int i = 0;
 			do {
 				String result = server.send(this, msg);
-				if (result.startsWith("OK")) {
+				if (result != null && result.startsWith("OK")) {
 					break; // done successfully
 				}
 				i++;

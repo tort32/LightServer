@@ -224,8 +224,20 @@ public class LightService {
 			return Response.status(Status.BAD_GATEWAY).build();
 		}
 		light.setAnimation(desc.name);
-		LightAnimationDesc anim = new LightAnimationDesc(light.getAnimation());
-		return Response.ok().entity(anim).build();
+		IAnimation anim = light.getAnimation();
+		
+		if (desc.params != null) {
+			AnimationDescriptor animDesc = anim.getDescriptor();
+			for(LightSetAnimParam param : desc.params) {
+				try {
+					animDesc.setParam(param.name, param.value);
+				} catch (RuntimeException e) {
+					continue;
+				}
+			}
+		}
+		LightAnimationDesc animDesc = new LightAnimationDesc(anim);
+		return Response.ok().entity(animDesc).build();
 	}
 	
 	@PUT

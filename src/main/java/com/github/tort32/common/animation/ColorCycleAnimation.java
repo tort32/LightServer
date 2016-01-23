@@ -2,12 +2,12 @@ package com.github.tort32.common.animation;
 
 import com.github.tort32.api.lifx.protocol.HSBK;
 
-public class ColorCycleAnimation implements IAnimation {
+public class ColorCycleAnimation extends BaseAnimation {
 	public static final String NAME = "cycle";
 	
-	private static final boolean DEFAULT_REVERSE = false;
-	private static final int DEFAULT_BRIGHTNESS = 50;
-	private static final int DEFAULT_SPEED = 5;
+	private static final int SPEED_DEFAULT = 5;
+	private static final int BRIGHTNESS_DEFAULT = 50;
+	private static final boolean REVERSE_DEFAULT = false;
 	
 	private static final String PRESET_NAME = "preset";
 	private static final String PRESET_NONE = "";
@@ -21,16 +21,13 @@ public class ColorCycleAnimation implements IAnimation {
 	};
 	
 	protected SelectorParam presetParam = new SelectorParam(PRESET_NAME, "Preset configuration", PRESETS, PRESET_NONE);
-	protected RangeParam speedParam = new RangeParam("speed", "Hue change speed", 1, 10, DEFAULT_SPEED);
-	protected RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, DEFAULT_BRIGHTNESS);
-	protected CheckerParam reversParam = new CheckerParam("reverse", "Reverse color change", DEFAULT_REVERSE);
+	protected RangeParam speedParam = new RangeParam("speed", "Hue change speed", 1, 10, SPEED_DEFAULT);
+	protected RangeParam brightnessParam = new RangeParam("brightness", "Color brightness", 0, HSBK.BRIGHTNESS_MAX, BRIGHTNESS_DEFAULT);
+	protected CheckerParam reversParam = new CheckerParam("reverse", "Reverse color change", REVERSE_DEFAULT);
 	
-	private final AnimationDescriptor desc;
-	private AnimationFrame frame;
-	private int speed = DEFAULT_SPEED;
-	private int brightness = DEFAULT_BRIGHTNESS;
-	private boolean reverse = DEFAULT_REVERSE;
-	
+	private int speed = SPEED_DEFAULT;
+	private int brightness = BRIGHTNESS_DEFAULT;
+	private boolean reverse = REVERSE_DEFAULT;
 	private int hue = 0;
 	
 	private AnimationParam.IChangeListener<String> presetChangeListener = new AnimationParam.IChangeListener<String>() {
@@ -79,8 +76,6 @@ public class ColorCycleAnimation implements IAnimation {
 	};
 	
 	public ColorCycleAnimation() {
-		frame = new AnimationFrame();
-		
 		desc = new AnimationDescriptor(NAME);
 		desc.addParam(presetParam);
 		desc.setChangeListener((name) -> {
@@ -101,16 +96,6 @@ public class ColorCycleAnimation implements IAnimation {
 			ColorCycleAnimation.this.reverse = newValue;
 		});
 		desc.addParam(speedParam, brightnessParam, reversParam);
-	}
-
-	@Override
-	public String getName() {
-		return NAME;
-	}
-	
-	@Override
-	public AnimationDescriptor getDescriptor() {
-		return desc;
 	}
 
 	@Override

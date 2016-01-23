@@ -3,6 +3,7 @@ package com.github.tort32.common.animation;
 import java.io.IOException;
 
 import com.github.tort32.common.ILight;
+import com.github.tort32.common.entity.LightState;
 
 public class LightAnimator {
 	
@@ -43,6 +44,14 @@ public class LightAnimator {
 		
 		@Override
 		public void run() {
+			try {
+				LightState initState = light.getState();
+				if (initState != null) {
+					anim.setInitColor(initState.color);
+				}
+			} catch(IOException e) {
+				// Skip
+			}
 			while (isRunning) {
 				AnimationFrame frame = anim.getNextFrame();
 				try {

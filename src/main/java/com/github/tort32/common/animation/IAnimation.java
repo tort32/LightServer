@@ -8,6 +8,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.tort32.common.entity.LightColor;
+
 public interface IAnimation {
 	
 	public class AnimationDescriptor {
@@ -157,6 +159,10 @@ public interface IAnimation {
 		
 		public String[] options;
 		
+		SelectorParam(String name, String desc, String[] options) {
+			this(name, desc, options, options[0]);
+		}
+		
 		SelectorParam(String name, String desc, String[] options, String defaultValue) {
 			super(AnimationParamType.COMBOBOX, name, desc, defaultValue);
 			this.options = options;
@@ -194,6 +200,8 @@ public interface IAnimation {
 	String getName();
 	
 	AnimationDescriptor getDescriptor();
+	
+	void setInitColor(LightColor color);
 
 	AnimationFrame getNextFrame();
 }
