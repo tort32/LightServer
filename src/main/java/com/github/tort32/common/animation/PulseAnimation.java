@@ -54,7 +54,6 @@ public class PulseAnimation extends BaseAnimation {
 	protected SelectorParam modParam = new SelectorParam(MOD_NAME, "Pulse form", ModType.getAllNames());
 	
 	private ModType type = ModType.SINE;
-	private int period = PERIOD_DEFAULT;
 	private int time;
 	private LightColor initColor = new LightColor(0, 0, 100);
 	
@@ -63,11 +62,10 @@ public class PulseAnimation extends BaseAnimation {
 		setFrameDuration(PERIOD_DEFAULT);
 		modParam.setChangeListener((newValue) -> {
 			type = ModType.getByName(newValue);
-			setFrameDuration(period);
+			setFrameDuration(periodParam.get());
 		});
 		periodParam.setChangeListener((newValue) -> {
-			period = newValue;
-			setFrameDuration(period);
+			setFrameDuration(periodParam.get());
 		});
 		desc.addParam(modParam, periodParam);
 	}
@@ -87,7 +85,7 @@ public class PulseAnimation extends BaseAnimation {
 	}
 	
 	private void setFrameDuration(int period) {
-		frame.duration = Math.min(period / 32, PERIOD_MIN / 2);
+		frame.duration = Math.max(period / 32, PERIOD_MIN / 2);
 		if (type == ModType.SQUARE) {
 			frame.transition = 0; // instant
 		} else {
@@ -96,6 +94,7 @@ public class PulseAnimation extends BaseAnimation {
 	}
 	
 	private double getNextModulationRatio() {
+		int period = periodParam.get();
 		time += frame.duration;
 		while (time > period) {
 			time -= period;
