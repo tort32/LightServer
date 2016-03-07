@@ -59,7 +59,7 @@ public class RawColor {
 		return intensity; 
 	}
 	
-	private RGB HSB2RGB(int hue, int sat, int br) {
+	protected static RGB HSB2RGB(int hue, int sat, int br) {
 		double r, g, b;
 		double t2 = (100.0 - (double) sat) * (double) br / 100.0;
 		double t3 = ((double) sat * (double) br / 100.0) * ((double) (hue % 60) / 60.0);
@@ -80,7 +80,7 @@ public class RawColor {
 	    return c;
 	}
 	
-	private HSB RGB2HSB(int r, int g, int b) {
+	protected static HSB RGB2HSB(int r, int g, int b) {
 		HSB c = new HSB();
 		int cMax = Math.max(Math.max(r, g), b);
 		if (cMax == 0) {
@@ -105,7 +105,7 @@ public class RawColor {
 		return c;
 	}
 
-	private RGB K2RGB(int kelvin) {
+	protected static RGB K2RGB(int kelvin) {
 		RGB c = new RGB();
 	    if (kelvin < 6600) {
 	        c.r = RGB_MAX;
@@ -122,21 +122,20 @@ public class RawColor {
 	    return c;
 	}
 	
-	private RGB HSBK2RGB(int hue, int sat, int br, int k) {
-		RGB c = new RGB();
-		RGB hsb = HSB2RGB(hue, sat, br);
-		RGB klv = K2RGB(k);
+	protected static RGB HSBK2RGB(int hue, int sat, int br, int k) {
+		RGB c = HSB2RGB(hue, sat, br);
+		RGB w = K2RGB(k);
 		double a = (double) sat / 100.0;
-		double b = 1.0 - a;
+		double b = (1.0 - a) / (double) RGB_MAX;
 		// Color components weighted by saturation
 		// Saturation = 100 is not impacted by color temperature
-		c.r = (int) ((double) hsb.r * a + (double) klv.r * b);
-		c.g = (int) ((double) hsb.g * a + (double) klv.g * b);
-		c.b = (int) ((double) hsb.b * a + (double) klv.b * b);
+		c.r = (int) ((double) c.r * (a + (double) w.r * b));
+		c.g = (int) ((double) c.g * (a + (double) w.g * b));
+		c.b = (int) ((double) c.b * (a + (double) w.b * b));
 		return c;
 	}
 	
-	private class RGB {
+	protected static class RGB {
 		public int r;
 		public int g;
 		public int b;
@@ -150,9 +149,33 @@ public class RawColor {
 			this.g = g;
 			this.b = b;
 		}
+		
+		@Override
+		public int hashCode() {
+			return (b << 16) + (g << 8) + r;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			} else if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			} else {
+				RGB other = (RGB) obj;
+				return (b == other.b && g == other.g && g == other.g);
+			}
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder(RGB.class.getSimpleName());
+			sb.append("(").append(r).append(", ").append(g).append(", ").append(b).append(")");
+			return sb.toString();
+		}
 	}
 	
-	private class HSB {
+	protected static class HSB {
 		public int h;
 		public int s;
 		public int b;
@@ -165,6 +188,30 @@ public class RawColor {
 			this.h = h;
 			this.s = s;
 			this.b = b;
+		}
+		
+		@Override
+		public int hashCode() {
+			return (h << 16) + (s << 8) + b;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			} else if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			} else {
+				HSB other = (HSB) obj;
+				return (h == other.h && s == other.s && b == other.b);
+			}
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder(HSB.class.getSimpleName());
+			sb.append("(").append(h).append(", ").append(s).append(", ").append(b).append(")");
+			return sb.toString();
 		}
 	}
 }
