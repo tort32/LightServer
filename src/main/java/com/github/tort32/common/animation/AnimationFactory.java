@@ -53,5 +53,6 @@ public class AnimationFactory {
 		registerAnimation(RandomAnimation.class);
 		registerAnimation(ColorCycleAnimation.class);
 		registerAnimation(PulseAnimation.class);
+		registerAnimation(GradientAnimation.class);
 	}
 }
