@@ -10,12 +10,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.tort32.api.lifx.protocol.Types;
 import com.github.tort32.api.lifx.protocol.device.recieve.StateService;
 import com.github.tort32.api.lifx.protocol.device.send.GetService;
 import com.github.tort32.api.lifx.protocol.message.Message;
 import com.github.tort32.api.lifx.protocol.message.Payload;
 
 public class LifxServer {
+	
+	private static Logger logger = LoggerFactory.getLogger(LifxServer.class);
 	
 	public static final LifxServer INSTANCE = new LifxServer();
 	
@@ -32,6 +38,11 @@ public class LifxServer {
 	
 	private LifxServer() {
 		// Singleton
+	}
+	
+	public void start(InetAddress laddr) throws SocketException {
+		socket = new DatagramSocket(StateService.DEFAULT_PORT, laddr);
+		socket.setSoTimeout(SO_TIMEOUT);
 	}
 	
 	public void start() throws SocketException {
@@ -53,6 +64,8 @@ public class LifxServer {
 			setSource(Message.SENDER_ID);
 		}};
 		byte[] send = msg.toArray();
+		logger.trace("Sent: " + Types.dumpBytes(send));
+		logger.trace(msg.toString());
 		DatagramPacket sendPacket = new DatagramPacket(send, send.length, broadcast, StateService.DEFAULT_PORT);
 		socket.send(sendPacket);
 		
@@ -67,6 +80,8 @@ public class LifxServer {
 			try {
 				byte[] received = rcvPacket.getData();
 				Message rcvMsg = new Message(received);
+				logger.trace("Received: " + Types.dumpBytes(received));
+				logger.trace(rcvMsg.toString());
 				if (rcvMsg.mPayload instanceof StateService
 						&& Message.SENDER_ID == rcvMsg.mFrame.mSource.getValue()) {
 					StateService payload = (StateService) rcvMsg.mPayload;
@@ -84,7 +99,7 @@ public class LifxServer {
 				continue; // Not ours data
 			}
 		}
-		
+
 		socket.setBroadcast(false);
 		
 		return lightsMap.values();

@@ -33,6 +33,11 @@ public class EspServer {
 		// Singleton
 	}
 	
+	public void start(InetAddress laddr) throws SocketException {
+		socket = new DatagramSocket(PORT, laddr);
+		socket.setSoTimeout(SO_TIMEOUT);
+	}
+	
 	public void start() throws SocketException {
 		socket = new DatagramSocket(PORT);
 		socket.setSoTimeout(SO_TIMEOUT);

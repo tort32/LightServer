@@ -1,4 +1,4 @@
-package com.github.tort32.lifx.protocol.test;
+package com.github.tort32.api.lifx.protocol;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

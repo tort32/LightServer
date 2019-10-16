@@ -1,4 +1,4 @@
-package com.github.tort32.lifx.nudemcu;
+package com.github.tort32.api.nodemcu;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

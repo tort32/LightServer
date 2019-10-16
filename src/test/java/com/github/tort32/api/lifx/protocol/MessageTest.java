@@ -1,4 +1,4 @@
-package com.github.tort32.lifx.protocol.test;
+package com.github.tort32.api.lifx.protocol;
 
 import static org.junit.Assert.*;
 

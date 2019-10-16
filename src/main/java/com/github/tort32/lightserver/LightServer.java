@@ -1,8 +1,14 @@
 package com.github.tort32.lightserver;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.ProtectionDomain;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.jetty.server.Server;
@@ -23,6 +29,13 @@ public class LightServer {
 
 	public static void main(String[] args) {
 		
+		InetAddress laddr;
+		try {
+			laddr = getLocalAddress();
+		} catch (SocketException | UnknownHostException e) {
+			throw new RuntimeException("Can't determine local IP address", e);
+		}
+		//Server server = new Server(new InetSocketAddress(laddr, 8080));
 		Server server = new Server(8080);
 		
 		ProtectionDomain protectionDomain = LightServer.class.getProtectionDomain();
@@ -34,7 +47,7 @@ public class LightServer {
 		LifxServer lifxServer = LifxServer.INSTANCE;
 		try {
 			logger.info("LifxServer starting ...");
-			lifxServer.start();
+			lifxServer.start(laddr);
 			logger.info("LifxServer discover ...");
 			Collection<LifxLight> lights = lifxServer.discover();
 			if(!lights.isEmpty()) {
@@ -53,7 +66,7 @@ public class LightServer {
 		EspServer espServer = EspServer.INSTANCE;
 		try {
 			logger.info("EspServer starting ...");
-			espServer.start();
+			espServer.start(laddr);
 			logger.info("EspServer discover ...");
 			Collection<EspLight> lights = espServer.discover();
 			if(!lights.isEmpty()) {
@@ -94,5 +107,25 @@ public class LightServer {
 
 	public static void shutdown() {
 		shutdownLatch.countDown();
+	}
+	
+	public static InetAddress getLocalAddress() throws SocketException, UnknownHostException  {
+		// Search real local address
+		Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+		while(e.hasMoreElements())
+		{
+		    NetworkInterface n = e.nextElement();
+		    if(!n.isUp() || n.isVirtual() || n.isLoopback() || !n.supportsMulticast())
+		    	continue;
+		    Enumeration<InetAddress> ee = n.getInetAddresses();
+		    while (ee.hasMoreElements())
+		    {
+		        InetAddress laddr = ee.nextElement();
+		        if(laddr.isLinkLocalAddress() || laddr.isLoopbackAddress())
+		        	continue;
+		        return laddr;
+		    }
+		}
+		return InetAddress.getLocalHost(); // Try default way
 	}
 }

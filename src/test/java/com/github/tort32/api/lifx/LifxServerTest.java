@@ -1,4 +1,4 @@
-package com.github.tort32.lifx.server.test;
+package com.github.tort32.api.lifx;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -7,6 +7,7 @@ import com.github.tort32.api.lifx.server.LifxLight;
 import com.github.tort32.api.lifx.server.LifxServer;
 import com.github.tort32.common.ILight;
 import com.github.tort32.common.entity.LightState;
+import com.github.tort32.lightserver.LightServer;
 
 public class LifxServerTest {
 	
@@ -15,7 +16,7 @@ public class LifxServerTest {
 		LifxServer server = null;
 		try {
 			server = LifxServer.INSTANCE;
-			server.start();
+			server.start(LightServer.getLocalAddress());
 			Collection<LifxLight> lights = server.discover();
 			for(ILight light : lights) {
 				LightState state = light.getState();
