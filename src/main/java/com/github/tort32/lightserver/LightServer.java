@@ -32,6 +32,8 @@ public class LightServer {
 		InetAddress laddr;
 		try {
 			laddr = getLocalAddress();
+			if(args.length > 0)
+				laddr = InetAddress.getByName(args[0]);
 		} catch (SocketException | UnknownHostException e) {
 			throw new RuntimeException("Can't determine local IP address", e);
 		}
@@ -46,7 +48,7 @@ public class LightServer {
 		
 		LifxServer lifxServer = LifxServer.INSTANCE;
 		try {
-			logger.info("LifxServer starting ...");
+			logger.info("LifxServer starting at " + laddr);
 			lifxServer.start(laddr);
 			logger.info("LifxServer discover ...");
 			Collection<LifxLight> lights = lifxServer.discover();

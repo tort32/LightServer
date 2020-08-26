@@ -65,7 +65,7 @@ public class LifxServer {
 		}};
 		byte[] send = msg.toArray();
 		logger.trace("Sent: " + Types.dumpBytes(send));
-		logger.trace(msg.toString());
+		//logger.trace(msg.toString());
 		DatagramPacket sendPacket = new DatagramPacket(send, send.length, broadcast, StateService.DEFAULT_PORT);
 		socket.send(sendPacket);
 		
@@ -81,7 +81,7 @@ public class LifxServer {
 				byte[] received = rcvPacket.getData();
 				Message rcvMsg = new Message(received);
 				logger.trace("Received: " + Types.dumpBytes(received));
-				logger.trace(rcvMsg.toString());
+				//logger.trace(rcvMsg.toString());
 				if (rcvMsg.mPayload instanceof StateService
 						&& Message.SENDER_ID == rcvMsg.mFrame.mSource.getValue()) {
 					StateService payload = (StateService) rcvMsg.mPayload;
